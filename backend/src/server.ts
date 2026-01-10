@@ -68,12 +68,25 @@ const startServer = async () => {
         await sequelize.authenticate();
         logger.info('Database connection established successfully');
 
-        // Sync database models
-        await sequelize.sync({ alter: true });
-        logger.info('Database models synchronized');
+        // Disable FK checks for SQLite init
+        await sequelize.query('PRAGMA foreign_keys = OFF;');
 
-        // Initialize database with sample data if needed
-        await initializeDatabase();
+        // Sync database models (standard sync for in-memory)
+        try {
+            await sequelize.sync();
+            logger.info('Database models synchronized');
+        } catch (syncError) {
+            logger.error('Sync failed:', syncError);
+            throw syncError;
+        }
+
+        // Initialize database with sample data (REQUIRED for in-memory DB)
+        try {
+            await initializeDatabase();
+            logger.info('Sample data initialized');
+        } catch (err) {
+            logger.error('Failed to seed database:', err);
+        }
 
         // Start server
         app.listen(PORT, () => {
