@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: collectiq-postgres
+    environment:
+      POSTGRES_DB: collectiq
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - collectiq-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: collectiq-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - collectiq-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ML API Service
+  ml-api:
+    build:
+      context: ./ml-models
+      dockerfile: Dockerfile
+    container_name: collectiq-ml-api
+    environment:
+      FLASK_ENV: production
+      FLASK_PORT: 8000
+      MODEL_PATH: /app/models
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml-models:/app
+    networks:
+      - collectiq-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: collectiq-backend
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: collectiq
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_DIALECT: postgres
+      JWT_SECRET: collectiq-jwt-secret-change-in-production
+      JWT_EXPIRES_IN: 7d
+      ML_API_URL: http://ml-api:8000
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ml-api:
+        condition: service_healthy
+    networks:
+      - collectiq-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: collectiq-frontend
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - collectiq-network
+
+networks:
+  collectiq-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

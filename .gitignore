@@ -1,0 +1,48 @@
+# Node
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv
+models/*.pkl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+.dockerignore
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+postgres_data/
+
+# ML
+*.pkl
+*.h5
+*.joblib
+training_data/
+
+# Misc
+.cache/
+tmp/
+temp/

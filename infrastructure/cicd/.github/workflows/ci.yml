@@ -1,0 +1,71 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm ci
+    
+    - name: Lint backend
+      run: |
+        cd backend
+        npm run lint || true
+    
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install ML dependencies
+      run: |
+        cd ml-models
+        pip install -r requirements.txt
+    
+    - name: Train ML model
+      run: |
+        cd ml-models
+        python training/train_model.py
+
+  build-and-push:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build Docker images
+      run: |
+        docker build -t collectiq-backend:latest ./backend
+        docker build -t collectiq-frontend:latest ./frontend
+        docker build -t collectiq-ml-api:latest ./ml-models
+    
+    - name: Push to registry (placeholder)
+      run: echo "Would push to container registry here"

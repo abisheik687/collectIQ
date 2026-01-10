@@ -1,0 +1,20 @@
+[
+    {
+        "id": "payment_reminder",
+        "channel": "email",
+        "subject": "Payment Reminder - Account {{accountNumber}}",
+        "content": "Dear {{customerName}},\n\nThis is a friendly reminder that your account {{accountNumber}} has an outstanding balance of ${{amount}}.\n\nPlease contact us at your earliest convenience to discuss payment options.\n\nBest regards,\n{{agencyName}}"
+    },
+    {
+        "id": "final_notice",
+        "channel": "email",
+        "subject": "Final Notice - Account {{accountNumber}}",
+        "content": "Dear {{customerName}},\n\nThis is a final notice regarding your overdue account {{accountNumber}} with a balance of ${{amount}}.\n\nPlease remit payment immediately to avoid further action.\n\nSincerely,\n{{agencyName}}"
+    },
+    {
+        "id": "payment_confirmation",
+        "channel": "email",
+        "subject": "Payment Received - Account {{accountNumber}}",
+        "content": "Dear {{customerName}},\n\nThank you for your payment on account {{accountNumber}}.\n\nYour account is now resolved.\n\nBest regards,\n{{agencyName}}"
+    }
+]

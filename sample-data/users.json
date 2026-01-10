@@ -1,0 +1,22 @@
+[
+    {
+        "email": "admin@enterprise.com",
+        "password": "admin123",
+        "name": "Enterprise Admin",
+        "role": "enterprise"
+    },
+    {
+        "email": "dca@agency.com",
+        "password": "dca123",
+        "name": "DCA Collector 1",
+        "role": "dca",
+        "agency": "Premium Recovery Solutions"
+    },
+    {
+        "email": "dca2@agency.com",
+        "password": "dca123",
+        "name": "DCA Collector 2",
+        "role": "dca",
+        "agency": "Elite Collections Inc"
+    }
+]
