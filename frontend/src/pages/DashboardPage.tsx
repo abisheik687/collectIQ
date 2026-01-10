@@ -103,7 +103,7 @@ export default function DashboardPage() {
                         <tbody>
                             {cases?.slice(0, 10).map((caseItem: any) => (
                                 <tr key={caseItem.id}>
-                                    <td><code>{caseItem.case Number}</code></td>
+                                    <td><code>{caseItem.caseNumber}</code></td>
                                     <td>{caseItem.customerName}</td>
                                     <td>${caseItem.amount.toLocaleString()}</td>
                                     <td>{caseItem.overdueDays} days</td>
