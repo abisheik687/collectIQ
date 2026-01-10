@@ -668,7 +668,7 @@ MIT License - See [LICENSE](LICENSE) for details
 
 **🎉 Built for Hackathon Submission | Production-Ready | Code-Complete | All 8 Requirements Met**
 
-**GitHub**: [Add Your Repo URL Here]
+**GitHub**: https://github.com/abisheik687/collectIQ
 
 **Demo**: http://localhost:3000 (after running `docker-compose up`)
 
