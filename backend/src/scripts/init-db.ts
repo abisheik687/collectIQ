@@ -75,6 +75,30 @@ export async function initializeDatabase(): Promise<void> {
                 contactFrequency: 0,
             });
 
+            // Assign some cases to DCAs for demo purposes
+            let assignedDcaId = undefined;
+            let assignedDcaName = undefined;
+            let status: 'new' | 'assigned' = 'new';
+
+            // Assign first 2 cases to DCA 1
+            if (caseData.accountNumber === 'ACC-001' || caseData.accountNumber === 'ACC-002') {
+                const dca1 = await User.findOne({ where: { email: 'dca@agency.com' } });
+                if (dca1) {
+                    assignedDcaId = dca1.id;
+                    assignedDcaName = dca1.agency; // Use agency name as dcaName
+                    status = 'assigned';
+                }
+            }
+            // Assign next 2 cases to DCA 2
+            else if (caseData.accountNumber === 'ACC-003' || caseData.accountNumber === 'ACC-004') {
+                const dca2 = await User.findOne({ where: { email: 'dca2@agency.com' } });
+                if (dca2) {
+                    assignedDcaId = dca2.id;
+                    assignedDcaName = dca2.agency;
+                    status = 'assigned';
+                }
+            }
+
             // Create case
             const newCase = await Case.create({
                 caseNumber,
@@ -82,12 +106,14 @@ export async function initializeDatabase(): Promise<void> {
                 customerName: caseData.customerName,
                 amount: caseData.amount,
                 overdueDays: caseData.overdueDays,
-                status: 'new',
+                status: status,
                 priority: prediction.priority,
                 riskScore: prediction.riskScore,
                 paymentProbability: prediction.paymentProbability,
                 contactCount: 0,
                 createdBy: admin.id,
+                assignedDcaId,
+                assignedDcaName,
             });
 
             // Initialize workflow

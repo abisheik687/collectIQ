@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import { Op } from 'sequelize';
+import { sequelize } from '../config/database';
 import Case from '../models/Case';
 import Workflow from '../models/Workflow';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
@@ -50,8 +51,10 @@ router.get('/', async (req: AuthRequest, res: Response, next) => {
             where,
             limit: parseInt(limit as string),
             offset,
-            order: [['createdAt', 'DESC']],
-            include: [{ model: Workflow, as: 'workflow' }],
+            order: [
+                [sequelize.literal(`CASE WHEN status IN ('resolved', 'closed') THEN 1 ELSE 0 END`), 'ASC'],
+                ['createdAt', 'DESC']
+            ],
         });
 
         res.json({
@@ -71,9 +74,7 @@ router.get('/', async (req: AuthRequest, res: Response, next) => {
 // Get case by ID
 router.get('/:id', async (req: AuthRequest, res: Response, next) => {
     try {
-        const caseRecord = await Case.findByPk(req.params.id, {
-            include: [{ model: Workflow, as: 'workflow' }],
-        });
+        const caseRecord = await Case.findByPk(req.params.id);
 
         if (!caseRecord) {
             throw new AppError('Case not found', 404);

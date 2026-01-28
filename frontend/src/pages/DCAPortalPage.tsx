@@ -51,7 +51,16 @@ export default function DCAPortalPage() {
             <div className="grid grid-cols-2">
                 {/* Cases List */}
                 <div className="card">
-                    <h3 style={{ marginBottom: '1rem' }}>My Assigned Cases</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h3 style={{ margin: 0 }}>My Assigned Cases</h3>
+                        <button
+                            onClick={() => refetch()}
+                            className="btn btn-sm btn-secondary"
+                            title="Refresh List"
+                        >
+                            Refresh
+                        </button>
+                    </div>
                     <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
                         {cases?.map((caseItem: any) => (
                             <div

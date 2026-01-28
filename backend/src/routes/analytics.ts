@@ -44,17 +44,17 @@ router.get('/aging-buckets', async (req: AuthRequest, res: Response, next) => {
         const buckets = await sequelize.query(`
       SELECT 
         CASE 
-          WHEN overdue_days <= 30 THEN '0-30 days'
-          WHEN overdue_days <= 60 THEN '31-60 days'
-          WHEN overdue_days <= 90 THEN '61-90 days'
-          WHEN overdue_days <= 120 THEN '91-120 days'
+          WHEN overdueDays <= 30 THEN '0-30 days'
+          WHEN overdueDays <= 60 THEN '31-60 days'
+          WHEN overdueDays <= 90 THEN '61-90 days'
+          WHEN overdueDays <= 120 THEN '91-120 days'
           ELSE '120+ days'
         END as bucket,
         COUNT(*) as count,
         SUM(amount) as total_amount
       FROM cases
       GROUP BY bucket
-      ORDER BY MIN(overdue_days)
+      ORDER BY MIN(overdueDays)
     `, { type: 'SELECT' });
 
         res.json({ buckets });
@@ -90,14 +90,14 @@ router.get('/dca-performance', async (req: AuthRequest, res: Response, next) => 
     try {
         const performance = await sequelize.query(`
       SELECT 
-        assigned_dca_name as dca_name,
+        assignedDcaName as dca_name,
         COUNT(*) as total_cases,
         COUNT(CASE WHEN status IN ('resolved', 'closed') THEN 1 END) as resolved_cases,
-        AVG(payment_probability) as avg_payment_probability,
-        AVG(risk_score) as avg_risk_score
+        AVG(paymentProbability) as avg_payment_probability,
+        AVG(riskScore) as avg_risk_score
       FROM cases
-      WHERE assigned_dca_id IS NOT NULL
-      GROUP BY assigned_dca_name
+      WHERE assignedDcaId IS NOT NULL
+      GROUP BY assignedDcaName
       ORDER BY resolved_cases DESC
     `, { type: 'SELECT' });
 
