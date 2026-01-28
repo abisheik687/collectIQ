@@ -89,10 +89,10 @@ AuditLog.init(
         timestamps: false,
         indexes: [
             {
-                fields: ['entity_type', 'entity_id'],
+                fields: ['entityType', 'entityId'],
             },
             {
-                fields: ['user_id'],
+                fields: ['userId'],
             },
             {
                 fields: ['timestamp'],
