@@ -8,6 +8,10 @@ import caseRoutes from './routes/cases';
 import analyticsRoutes from './routes/analytics';
 import auditRoutes from './routes/audit';
 import communicationRoutes from './routes/communication';
+import emailRoutes from './routes/email';
+import adminRoutes from './routes/admin';
+import complianceRoutes from './routes/compliance';
+import workflowRoutes from './routes/workflow';
 import { errorHandler } from './middleware/errorHandler';
 import { initializeDatabase } from './scripts/init-db';
 
@@ -49,6 +53,10 @@ app.use('/api/cases', caseRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/communication', communicationRoutes);
+app.use('/api/email', emailRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/compliance', complianceRoutes);
+app.use('/api/workflow', workflowRoutes); // Workflow guardrails enforcement
 
 // 404 handler
 app.use((req: Request, res: Response) => {

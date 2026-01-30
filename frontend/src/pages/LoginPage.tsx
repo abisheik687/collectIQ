@@ -51,10 +51,37 @@ export default function LoginPage() {
             alignItems: 'center',
             justifyContent: 'center'
         }}>
-            <div className="card" style={{ maxWidth: '400px', width: '100%' }}>
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>CollectIQ</h1>
-                    <p style={{ color: 'var(--text-secondary)' }}>AI-Powered DCA Management</p>
+            <div className="card" style={{ maxWidth: '450px', width: '100%', padding: '2.5rem' }}>
+                <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                    <div style={{
+                        width: '64px',
+                        height: '64px',
+                        background: 'linear-gradient(135deg, var(--accent) 0%, #ea580c 100%)',
+                        borderRadius: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 1rem',
+                        boxShadow: '0 8px 24px rgba(249, 115, 22, 0.3)',
+                    }}>
+                        <span style={{
+                            color: 'white',
+                            fontWeight: 900,
+                            fontSize: '2rem',
+                            fontFamily: 'JetBrains Mono, monospace'
+                        }}>IQ</span>
+                    </div>
+                    <h1 style={{
+                        fontSize: '2.5rem',
+                        marginBottom: '0.5rem',
+                        fontWeight: 800,
+                        letterSpacing: '-0.03em'
+                    }}>
+                        Collect<span style={{ color: 'var(--accent)' }}>IQ</span>
+                    </h1>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>
+                        Logistics Prime Platform
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit}>

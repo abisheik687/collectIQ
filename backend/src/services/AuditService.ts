@@ -1,11 +1,11 @@
 import AuditLog from '../models/AuditLog';
 import { logger } from '../utils/logger';
 
-interface AuditData {
+export interface AuditData {
     action: string;
     entityType: string;
-    entityId: number;
-    userId: number;
+    entityId: number | string;  // Allow string for case IDs
+    userId: number | null;  // Allow null for system actions
     userName: string;
     beforeState?: any;
     afterState?: any;
@@ -13,7 +13,7 @@ interface AuditData {
     userAgent?: string;
 }
 
-class AuditService {
+class AuditServiceClass {
     async log(data: AuditData): Promise<void> {
         try {
             await AuditLog.create({
@@ -83,4 +83,6 @@ class AuditService {
     }
 }
 
-export default new AuditService();
+// Export singleton instance
+export const AuditService = new AuditServiceClass();
+export default AuditService;

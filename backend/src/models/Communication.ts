@@ -1,41 +1,43 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../config/database';
 
-export interface CommunicationAttributes {
+interface CommunicationAttributes {
     id: number;
     caseId: number;
-    channel: 'sms' | 'email' | 'portal';
-    templateId?: string;
+    type: 'email' | 'sms';
+    template: string;
+    recipient: string;
     subject?: string;
-    content: string;
-    recipientEmail?: string;
-    recipientPhone?: string;
-    status: 'pending' | 'sent' | 'delivered' | 'failed';
+    message: string;
+    status: 'pending' | 'sent' | 'delivered' | 'failed' | 'opened';
     sentAt?: Date;
     deliveredAt?: Date;
+    openedAt?: Date;
     errorMessage?: string;
-    createdBy: number;
+    sentBy: number;
+    sentByName: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
-interface CommunicationCreationAttributes extends Optional<CommunicationAttributes, 'id' | 'status'> { }
+interface CommunicationCreationAttributes
+    extends Optional<CommunicationAttributes, 'id' | 'subject' | 'sentAt' | 'deliveredAt' | 'openedAt' | 'errorMessage' | 'createdAt' | 'updatedAt'> { }
 
 class Communication extends Model<CommunicationAttributes, CommunicationCreationAttributes> implements CommunicationAttributes {
     public id!: number;
     public caseId!: number;
-    public channel!: 'sms' | 'email' | 'portal';
-    public templateId?: string;
+    public type!: 'email' | 'sms';
+    public template!: string;
+    public recipient!: string;
     public subject?: string;
-    public content!: string;
-    public recipientEmail?: string;
-    public recipientPhone?: string;
-    public status!: 'pending' | 'sent' | 'delivered' | 'failed';
+    public message!: string;
+    public status!: 'pending' | 'sent' | 'delivered' | 'failed' | 'opened';
     public sentAt?: Date;
     public deliveredAt?: Date;
+    public openedAt?: Date;
     public errorMessage?: string;
-    public createdBy!: number;
-
+    public sentBy!: number;
+    public sentByName!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
@@ -50,33 +52,33 @@ Communication.init(
         caseId: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            references: {
+                model: 'cases',
+                key: 'id',
+            },
         },
-        channel: {
-            type: DataTypes.ENUM('sms', 'email', 'portal'),
+        type: {
+            type: DataTypes.ENUM('email', 'sms'),
             allowNull: false,
         },
-        templateId: {
+        template: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
+        },
+        recipient: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         subject: {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        content: {
+        message: {
             type: DataTypes.TEXT,
             allowNull: false,
         },
-        recipientEmail: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        recipientPhone: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
         status: {
-            type: DataTypes.ENUM('pending', 'sent', 'delivered', 'failed'),
+            type: DataTypes.ENUM('pending', 'sent', 'delivered', 'failed', 'opened'),
             allowNull: false,
             defaultValue: 'pending',
         },
@@ -88,19 +90,27 @@ Communication.init(
             type: DataTypes.DATE,
             allowNull: true,
         },
+        openedAt: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
         errorMessage: {
             type: DataTypes.TEXT,
             allowNull: true,
         },
-        createdBy: {
+        sentBy: {
             type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        sentByName: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
     },
     {
         sequelize,
         tableName: 'communications',
-        modelName: 'Communication',
+        timestamps: true,
     }
 );
 

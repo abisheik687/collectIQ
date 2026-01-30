@@ -7,6 +7,8 @@ import DCAPortalPage from './pages/DCAPortalPage';
 import CaseDetailsPage from './pages/CaseDetailsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import AuditPage from './pages/AuditPage';
+import ComplianceDecisionPage from './pages/ComplianceDecisionPage';
+import AdminGovernancePage from './pages/AdminGovernancePage';
 import Layout from './components/Layout';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -42,10 +44,23 @@ function App() {
                     <Route path="cases/:id" element={<CaseDetailsPage />} />
                     <Route path="analytics" element={<AnalyticsPage />} />
                     <Route path="audit" element={<AuditPage />} />
+                    <Route path="compliance" element={<ComplianceDecisionPage />} />
+                    <Route path="governance" element={<AdminGovernancePage />} />
                 </Route>
             </Routes>
 
-            <Toaster position="top-right" />
+            <Toaster
+                position="top-right"
+                toastOptions={{
+                    duration: 3000,
+                    success: {
+                        duration: 3000,
+                    },
+                    error: {
+                        duration: 3000,
+                    },
+                }}
+            />
         </>
     );
 }

@@ -5,7 +5,7 @@ export const errorHandler = (
     err: any,
     req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction // Prefix with _ to indicate intentionally unused
 ) => {
     logger.error('Error:', {
         message: err.message,

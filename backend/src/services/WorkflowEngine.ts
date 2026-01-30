@@ -1,13 +1,35 @@
 import Case from '../models/Case';
 import Workflow from '../models/Workflow';
 import { logger } from '../utils/logger';
-import { addHours, isBefore, differenceInHours } from 'date-fns';
+import { addHours, differenceInHours } from 'date-fns';
 
 class WorkflowEngine {
     private readonly SLA_HOURS = parseInt(process.env.DEFAULT_SLA_HOURS || '48');
-    private readonly ESCALATION_SLA_HOURS = parseInt(process.env.ESCALATION_SLA_HOURS || '72');
 
-    async initializeWorkflow(caseId: number): Promise<Workflow> {
+    // COMPLIANCE GUARDRAILS: Define allowed workflow transitions (Finite State Machine)
+    // This enforces "Guardrails vs. Guidelines" - technically impossible to skip steps
+    private readonly ALLOWED_TRANSITIONS: Record<string, string[]> = {
+        'assign': ['contact'],
+        'contact': ['follow_up', 'close'],
+        'follow_up': ['escalate', 'close'],
+        'escalate': ['close'],
+        'close': [] // Terminal state
+    };
+
+    // Required actions before advancing workflow stage
+    private readonly REQUIRED_ACTIONS: Record<string, string[]> = {
+        'contact': ['case_viewed', 'communication_initiated'],
+        'follow_up': ['initial_contact_completed'],
+        'escalate': ['follow_up_attempted'],
+        'close': ['resolution_documented']
+    };
+
+    /**
+     * Initialize workflow for a new case
+     * @param caseId - The case ID to initialize workflow for
+     * @param transaction - Optional Sequelize transaction for atomic operations
+     */
+    async initializeWorkflow(caseId: number, transaction?: any): Promise<Workflow> {
         const workflow = await Workflow.create({
             caseId,
             currentStage: 'assign',
@@ -19,10 +41,68 @@ class WorkflowEngine {
                 stage: 'assign',
                 timestamp: new Date(),
             }],
-        });
+        }, transaction ? { transaction } : {});
 
         await this.updateCaseSLA(caseId);
         return workflow;
+    }
+
+    /**
+     * Validates if a workflow transition is allowed by the state machine
+     * @throws Error if transition violates SOP requirements
+     */
+    private validateTransition(currentStage: string, newStage: string): void {
+        const allowedStages = this.ALLOWED_TRANSITIONS[currentStage] || [];
+
+        if (!allowedStages.includes(newStage)) {
+            const allowedList = allowedStages.length > 0
+                ? allowedStages.join(', ')
+                : 'none (terminal state)';
+
+            throw new Error(
+                `WORKFLOW_VIOLATION: Cannot transition from '${currentStage}' to '${newStage}'. ` +
+                `SOP requires progression through: ${allowedList}. ` +
+                `This guardrail prevents compliance breaches.`
+            );
+        }
+    }
+
+    /**
+     * Verifies that required actions have been completed before stage advancement
+     * @throws Error if required actions are missing
+     */
+    private async verifyRequiredActions(caseId: number, newStage: string): Promise<void> {
+        const requiredActions = this.REQUIRED_ACTIONS[newStage] || [];
+
+        if (requiredActions.length === 0) {
+            return; // No requirements for this stage
+        }
+
+        // Check audit log for required actions
+        const AuditLog = (await import('../models/AuditLog')).default;
+        const recentActions = await AuditLog.findAll({
+            where: {
+                entityType: 'Case',
+                entityId: caseId
+            },
+            order: [['timestamp', 'DESC']],
+            limit: 50
+        });
+
+        const completedActions = recentActions.map(log => log.action);
+        const missingActions = requiredActions.filter(action =>
+            !completedActions.some(completed =>
+                completed.toLowerCase().includes(action.toLowerCase().replace('_', ' '))
+            )
+        );
+
+        if (missingActions.length > 0) {
+            throw new Error(
+                `COMPLIANCE_BLOCK: Cannot advance to '${newStage}' stage. ` +
+                `Missing required actions: ${missingActions.join(', ')}. ` +
+                `Please complete all mandatory SOP steps before proceeding.`
+            );
+        }
     }
 
     async transitionStage(
@@ -33,6 +113,21 @@ class WorkflowEngine {
 
         if (!workflow) {
             throw new Error('Workflow not found for case');
+        }
+
+        // GUARDRAIL ENFORCEMENT: Validate transition is allowed
+        this.validateTransition(workflow.currentStage, newStage);
+
+        // COMPLIANCE CHECK: Verify required actions completed (optional strict mode)
+        const strictMode = process.env.WORKFLOW_STRICT_MODE !== 'false';
+        if (strictMode) {
+            try {
+                await this.verifyRequiredActions(caseId, newStage);
+            } catch (error) {
+                // Log compliance block attempt
+                logger.warn(`Workflow violation prevented for case ${caseId}: ${error}`);
+                throw error;
+            }
         }
 
         const history = workflow.stageHistory || [];
@@ -131,7 +226,30 @@ class WorkflowEngine {
             slaDueDate: caseRecord?.slaDueDate,
             escalationCount: workflow?.escalationCount,
             stageHistory: workflow?.stageHistory,
+            allowedTransitions: this.getAllowedTransitions(workflow?.currentStage || 'assign'),
+            requiredActions: this.REQUIRED_ACTIONS[workflow?.currentStage || 'assign'] || []
         };
+    }
+
+    /**
+     * Get allowed next stages from current workflow state
+     */
+    getAllowedTransitions(currentStage: string): string[] {
+        return this.ALLOWED_TRANSITIONS[currentStage] || [];
+    }
+
+    /**
+     * Get count of prevented workflow violations (for compliance reporting)
+     */
+    async getPreventedViolationsCount(): Promise<number> {
+        // Count audit log entries where workflow violations were blocked
+        const AuditLog = (await import('../models/AuditLog')).default;
+        const violations = await AuditLog.count({
+            where: {
+                action: 'WORKFLOW_VIOLATION_PREVENTED'
+            }
+        });
+        return violations;
     }
 }
 

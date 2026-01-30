@@ -1,0 +1,627 @@
+# AI Compliance Decision System - Sample Case Dataset
+
+## Purpose
+This file contains 10 representative cases for demonstrating the AI compliance decision system across various scenarios: compliant actions, compliance violations, ethical concerns, vulnerable debtors, and edge cases.
+
+---
+
+## Case 1: Standard Compliant Action (Email Reminder)
+
+```json
+{
+    "case_id": "CASE-10001",
+    "case_number": "CASE-2026-10001",
+    "account_number": "ACC-55123",
+    "customer_name": "John Smith",
+    "amount_due": 1500.00,
+    "days_overdue": 25,
+    "status": "new",
+    "priority": "medium",
+    "contact_history": {
+        "past_contact_count": 0,
+        "last_contact_channel": null,
+        "last_contact_date": null,
+        "contacts_last_7_days": [],
+        "contacts_last_30_days": []
+    },
+    "response_history": "no_contact_yet",
+    "consent_status": "all",
+    "vulnerability_flag": false,
+    "debtor_info": {
+        "phone": "+1-555-0100",
+        "email": "john.smith@email.com",
+        "preferred_channel": "email",
+        "timezone": "America/New_York"
+    },
+    "expected_ai_decision": {
+        "decision": "ALLOWED",
+        "recommended_action": "send_email_payment_reminder",
+        "compliance_status": "PASSED",
+        "ethical_risk_score": 15,
+        "blocking_reasons": []
+    }
+}
+```
+
+---
+
+## Case 2: TCPA Violation (No SMS Consent)
+
+```json
+{
+    "case_id": "CASE-10002",
+    "case_number": "CASE-2026-10002",
+    "account_number": "ACC-78456",
+    "customer_name": "Sarah Johnson",
+    "amount_due": 3200.00,
+    "days_overdue": 45,
+    "status": "assigned",
+    "priority": "high",
+    "contact_history": {
+        "past_contact_count": 3,
+        "last_contact_channel": "email",
+        "last_contact_date": "2026-01-27",
+        "contacts_last_7_days": [
+            {
+                "date": "2026-01-27",
+                "channel": "email"
+            },
+            {
+                "date": "2026-01-25",
+                "channel": "phone"
+            }
+        ],
+        "contacts_last_30_days": [
+            {
+                "date": "2026-01-27",
+                "channel": "email"
+            },
+            {
+                "date": "2026-01-25",
+                "channel": "phone"
+            },
+            {
+                "date": "2026-01-20",
+                "channel": "email"
+            }
+        ]
+    },
+    "response_history": "no_answer",
+    "consent_status": "phone_email",
+    "vulnerability_flag": false,
+    "debtor_info": {
+        "phone": "+1-555-0200",
+        "email": "sarah.j@email.com",
+        "preferred_channel": "email",
+        "timezone": "America/Chicago"
+    },
+    "proposed_action": "send_sms_reminder",
+    "expected_ai_decision": {
+        "decision": "BLOCKED",
+        "recommended_action": null,
+        "compliance_status": "FAILED",
+        "violated_rules": [
+            "TCPA_CONSENT_VIOLATION"
+        ],
+        "blocking_reasons": [
+            "SMS channel not in consented channels (consent: phone_email only)"
+        ],
+        "safer_alternatives": [
+            "send_email",
+            "send_phone_call"
+        ]
+    }
+}
+```
+
+---
+
+## Case 3: Frequency Limit Exceeded (Too Many SMS)
+
+```json
+{
+    "case_id": "CASE-10003",
+    "case_number": "CASE-2026-10003",
+    "account_number": "ACC-91234",
+    "customer_name": "Michael Chen",
+    "amount_due": 5800.00,
+    "days_overdue": 60,
+    "status": "in_progress",
+    "priority": "high",
+    "contact_history": {
+        "past_contact_count": 7,
+        "last_contact_channel": "sms",
+        "last_contact_date": "2026-01-29",
+        "contacts_last_7_days": [
+            {
+                "date": "2026-01-29",
+                "channel": "sms",
+                "time": "09:15:00"
+            },
+            {
+                "date": "2026-01-28",
+                "channel": "phone"
+            },
+            {
+                "date": "2026-01-27",
+                "channel": "phone"
+            },
+            {
+                "date": "2026-01-26",
+                "channel": "phone"
+            },
+            {
+                "date": "2026-01-24",
+                "channel": "email"
+            }
+        ],
+        "sms_count_today": 1
+    },
+    "response_history": "partial_engagement",
+    "consent_status": "all",
+    "vulnerability_flag": false,
+    "debtor_info": {
+        "phone": "+1-555-0300",
+        "email": "m.chen@email.com",
+        "timezone": "America/Los_Angeles"
+    },
+    "proposed_action": "send_sms_escalation",
+    "expected_ai_decision": {
+        "decision": "BLOCKED",
+        "compliance_status": "FAILED",
+        "violated_rules": [
+            "CFPB_FREQUENCY_LIMIT"
+        ],
+        "blocking_reasons": [
+            "Daily SMS limit reached (1/1 sent today at 09:15)",
+            "Weekly phone limit at risk (3/3 calls this week)"
+        ],
+        "ethical_risk_score": 68,
+        "safer_alternatives": [
+            "send_email",
+            "wait_24h_then_sms"
+        ]
+    }
+}
+```
+
+---
+
+## Case 4: Disputed Debt (Legal Block)
+
+```json
+{
+    "case_id": "CASE-10004",
+    "case_number": "CASE-2026-10004",
+    "account_number": "ACC-44567",
+    "customer_name": "Emily Rodriguez",
+    "amount_due": 8200.00,
+    "days_overdue": 67,
+    "status": "follow_up",
+    "priority": "high",
+    "contact_history": {
+        "past_contact_count": 8,
+        "last_contact_channel": "email",
+        "last_contact_date": "2026-01-28",
+        "contacts_last_7_days": [
+            {
+                "date": "2026-01-28",
+                "channel": "email"
+            },
+            {
+                "date": "2026-01-26",
+                "channel": "phone"
+            },
+            {
+                "date": "2026-01-24",
+                "channel": "sms"
+            }
+        ],
+        "dispute_received_date": "2026-01-28"
+    },
+    "response_history": "disputed",
+    "dispute_details": {
+        "reason": "Amount incorrect - claims only $4,000 owed",
+        "date_disputed": "2026-01-28",
+        "validation_provided": false
+    },
+    "consent_status": "all",
+    "vulnerability_flag": false,
+    "debtor_info": {
+        "phone": "+1-555-0400",
+        "email": "e.rodriguez@email.com",
+        "timezone": "America/New_York"
+    },
+    "proposed_action": "send_escalation_notice",
+    "expected_ai_decision": {
+        "decision": "BLOCKED",
+        "compliance_status": "FAILED",
+        "violated_rules": [
+            "FDCPA_DISPUTE_HANDLING"
+        ],
+        "blocking_reasons": [
+            "Debt disputed on 2026-01-28 - validation required before continued collection (FDCPA §809(b))"
+        ],
+        "mandatory_action": "PROVIDE_DEBT_VALIDATION",
+        "override_allowed": false,
+        "severity": "CRITICAL"
+    }
+}
+```
+
+---
+
+## Case 5: Vulnerable Debtor - Medical Hardship (Review Required)
+
+```json
+{
+    "case_id": "CASE-10005",
+    "case_number": "CASE-2026-10005",
+    "account_number": "ACC-22789",
+    "customer_name": "Robert Williams (Elderly)",
+    "amount_due": 12000.00,
+    "days_overdue": 95,
+    "status": "assigned",
+    "priority": "medium",
+    "contact_history": {
+        "past_contact_count": 4,
+        "last_contact_channel": "email",
+        "last_contact_date": "2026-01-22",
+        "contacts_last_7_days": [],
+        "contacts_last_30_days": [
+            {
+                "date": "2026-01-22",
+                "channel": "email"
+            },
+            {
+                "date": "2026-01-15",
+                "channel": "phone"
+            },
+            {
+                "date": "2026-01-08",
+                "channel": "email"
+            },
+            {
+                "date": "2026-01-02",
+                "channel": "phone"
+            }
+        ]
+    },
+    "response_history": "partial_payment_promise",
+    "engagement_notes": "Debtor indicated willingness to pay $200/month starting March due to medical bills",
+    "consent_status": "all",
+    "vulnerability_flag": true,
+    "vulnerability_reasons": [
+        "medical_hardship",
+        "elderly"
+    ],
+    "vulnerability_details": {
+        "age": 72,
+        "medical_debt_indicator": true,
+        "recent_hardship": "Major surgery in December 2025",
+        "income_status": "fixed_income_social_security"
+    },
+    "debtor_info": {
+        "phone": "+1-555-0500",
+        "email": "r.williams@email.com",
+        "timezone": "America/Chicago"
+    },
+    "proposed_action": "send_payment_plan_offer",
+    "expected_ai_decision": {
+        "decision": "REVIEW_REQUIRED",
+        "tentative_action": "send_payment_plan_offer",
+        "compliance_status": "PASSED_WITH_WARNINGS",
+        "warnings": [
+            "VULNERABLE_DEBTOR_PROTECTION"
+        ],
+        "ethical_risk_score": 48,
+        "ethical_breakdown": {
+            "harassment_risk": 25,
+            "psychological_pressure_risk": 30,
+            "vulnerable_debtor_risk": 85
+        },
+        "supervisor_approval_required": true,
+        "review_deadline": "2026-01-30T17:00:00"
+    }
+}
+```
+
+---
+
+## Case 6: Contact Time Violation (Outside Hours)
+
+```json
+{
+    "case_id": "CASE-10006",
+    "case_number": "CASE-2026-10006",
+    "account_number": "ACC-33901",
+    "customer_name": "Lisa Martinez",
+    "amount_due": 4500.00,
+    "days_overdue": 38,
+    "status": "assigned",
+    "priority": "medium",
+    "contact_history": {
+        "past_contact_count": 2,
+        "last_contact_channel": "email",
+        "last_contact_date": "2026-01-26"
+    },
+    "response_history": "no_answer",
+    "consent_status": "all",
+    "vulnerability_flag": false,
+    "debtor_info": {
+        "phone": "+1-555-0600",
+        "email": "lisa.m@email.com",
+        "timezone": "America/Los_Angeles"
+    },
+    "proposed_action": "send_phone_call",
+    "proposed_action_time": "2026-01-30T06:30:00",
+    "current_debtor_time": "2026-01-30T06:30:00 PST",
+    "expected_ai_decision": {
+        "decision": "BLOCKED",
+        "compliance_status": "FAILED",
+        "violated_rules": [
+            "FDCPA_TIME_WINDOW"
+        ],
+        "blocking_reasons": [
+            "Contact attempted at 6:30 AM (debtor local time) - outside allowed hours (8 AM - 9 PM)"
+        ],
+        "legal_reference": "FDCPA 15 USC § 1692c(a)(1)",
+        "next_allowed_time": "2026-01-30T08:00:00 PST",
+        "alternative_now": "send_email (allowed anytime)"
+    }
+}
+```
+
+---
+
+## Case 7: Low-Value Debt - Proportionality Check
+
+```json
+{
+    "case_id": "CASE-10007",
+    "case_number": "CASE-2026-10007",
+    "account_number": "ACC-66234",
+    "customer_name": "David Park",
+    "amount_due": 150.00,
+    "days_overdue": 120,
+    "status": "escalated",
+    "priority": "low",
+    "contact_history": {
+        "past_contact_count": 6,
+        "last_contact_channel": "phone",
+        "last_contact_date": "2026-01-20",
+        "escalation_count": 2
+    },
+    "response_history": "ignored",
+    "consent_status": "all",
+    "vulnerability_flag": false,
+    "debtor_info": {
+        "phone": "+1-555-0700",
+        "email": "d.park@email.com",
+        "timezone": "America/New_York"
+    },
+    "proposed_action": "legal_referral",
+    "expected_ai_decision": {
+        "decision": "BLOCKED",
+        "compliance_status": "PASSED",
+        "ethical_risk_score": 72,
+        "recommendation": "DO_NOT_PROCEED",
+        "blocking_reasons": [
+            "Disproportionate action: Legal referral for $150 debt is cost-prohibitive and appears punitive",
+            "Ethical concern: Legal costs likely exceed debt value (proportionality principle violated)"
+        ],
+        "safer_alternatives": [
+            "write_off_debt (recommended for low-value aged debt)",
+            "final_settlement_offer (50% discount)",
+            "small_claims_court (if legal action absolutely necessary)"
+        ]
+    }
+}
+```
+
+---
+
+## Case 8: High Engagement - Payment Plan Success
+
+```json
+{
+    "case_id": "CASE-10008",
+    "case_number": "CASE-2026-10008",
+    "account_number": "ACC-88456",
+    "customer_name": "Karen Thompson",
+    "amount_due": 6700.00,
+    "days_overdue": 52,
+    "status": "in_progress",
+    "priority": "medium",
+    "contact_history": {
+        "past_contact_count": 5,
+        "last_contact_channel": "phone",
+        "last_contact_date": "2026-01-27",
+        "contacts_last_7_days": [
+            {
+                "date": "2026-01-27",
+                "channel": "phone",
+                "outcome": "agreed_to_payment_plan"
+            }
+        ]
+    },
+    "response_history": "payment_plan_active",
+    "payment_plan_details": {
+        "monthly_amount": 300,
+        "start_date": "2026-02-01",
+        "duration_months": 24,
+        "status": "pending_first_payment"
+    },
+    "consent_status": "all",
+    "vulnerability_flag": false,
+    "debtor_info": {
+        "phone": "+1-555-0800",
+        "email": "k.thompson@email.com",
+        "timezone": "America/Denver"
+    },
+    "proposed_action": "send_payment_plan_confirmation",
+    "expected_ai_decision": {
+        "decision": "ALLOWED",
+        "recommended_action": "send_payment_plan_confirmation",
+        "compliance_status": "PASSED",
+        "ethical_risk_score": 8,
+        "rationale": "Debtor engaged positively and agreed to payment plan. Confirmation email reinforces agreement and provides documentation. Very low ethical risk."
+    }
+}
+```
+
+---
+
+## Case 9: Language Barrier - Translation Required
+
+```json
+{
+    "case_id": "CASE-10009",
+    "case_number": "CASE-2026-10009",
+    "account_number": "ACC-77123",
+    "customer_name": "Maria Gonzalez",
+    "amount_due": 2800.00,
+    "days_overdue": 41,
+    "status": "assigned",
+    "priority": "medium",
+    "contact_history": {
+        "past_contact_count": 3,
+        "last_contact_channel": "email",
+        "last_contact_date": "2026-01-25",
+        "language_barrier_noted": true
+    },
+    "response_history": "confused_expressed_language_difficulty",
+    "consent_status": "all",
+    "vulnerability_flag": true,
+    "vulnerability_reasons": [
+        "language_barrier"
+    ],
+    "vulnerability_details": {
+        "primary_language": "Spanish",
+        "english_proficiency": "limited",
+        "translation_required": true
+    },
+    "debtor_info": {
+        "phone": "+1-555-0900",
+        "email": "maria.g@email.com",
+        "timezone": "America/Los_Angeles"
+    },
+    "proposed_action": "send_email_english_only",
+    "expected_ai_decision": {
+        "decision": "REVIEW_REQUIRED",
+        "compliance_status": "PASSED_WITH_WARNINGS",
+        "warnings": [
+            "LANGUAGE_BARRIER_ACCOMMODATION_REQUIRED"
+        ],
+        "ethical_risk_score": 52,
+        "blocking_reasons": [
+            "Language barrier identified - English-only communication may violate debtor's rights to understand debt details"
+        ],
+        "required_modification": "Provide Spanish translation or bilingual communication",
+        "supervisor_approval_required": true,
+        "legal_consideration": "CFPB guidance on language access + state-specific requirements (CA has strict language access laws)"
+    }
+}
+```
+
+---
+
+## Case 10: Edge Case - Recent Bankruptcy Filing
+
+```json
+{
+    "case_id": "CASE-10010",
+    "case_number": "CASE-2026-10010",
+    "account_number": "ACC-99567",
+    "customer_name": "James Anderson",
+    "amount_due": 15000.00,
+    "days_overdue": 180,
+    "status": "escalated",
+    "priority": "high",
+    "contact_history": {
+        "past_contact_count": 12,
+        "last_contact_channel": "phone",
+        "last_contact_date": "2026-01-15"
+    },
+    "response_history": "bankruptcy_filed",
+    "bankruptcy_details": {
+        "filing_date": "2026-01-20",
+        "chapter": "Chapter 7",
+        "automatic_stay_active": true,
+        "case_number": "BK-2026-12345"
+    },
+    "consent_status": "all",
+    "vulnerability_flag": true,
+    "vulnerability_reasons": [
+        "financial_hardship"
+    ],
+    "debtor_info": {
+        "phone": "+1-555-1000",
+        "email": "j.anderson@email.com",
+        "timezone": "America/New_York"
+    },
+    "proposed_action": "send_payment_demand",
+    "expected_ai_decision": {
+        "decision": "BLOCKED",
+        "compliance_status": "FAILED",
+        "violated_rules": [
+            "BANKRUPTCY_AUTO_STAY_VIOLATION"
+        ],
+        "blocking_reasons": [
+            "CRITICAL: Bankruptcy automatic stay active since 2026-01-20 (Chapter 7 case BK-2026-12345)",
+            "ANY collection attempt violates 11 USC § 362 - Automatic Stay",
+            "Violation penalties: Contempt of court, damages, attorney fees"
+        ],
+        "mandatory_action": "CEASE_ALL_COLLECTION_IMMEDIATELY",
+        "legal_reference": "11 USC § 362 - Automatic Stay in Bankruptcy",
+        "override_allowed": false,
+        "severity": "CRITICAL",
+        "next_steps": [
+            "1. Flag case as 'bankruptcy_stay'",
+            "2. File proof of claim with bankruptcy court (if applicable)",
+            "3. Monitor bankruptcy docket for discharge/dismissal",
+            "4. Do NOT contact debtor until stay is lifted"
+        ]
+    }
+}
+```
+
+---
+
+## Summary Statistics
+
+| Decision Type | Count | Cases |
+|---------------|-------|-------|
+| ✅ ALLOWED | 2 | CASE-10001, CASE-10008 |
+| 🚫 BLOCKED | 6 | CASE-10002, CASE-10003, CASE-10004, CASE-10006, CASE-10007, CASE-10010 |
+| ⚠️ REVIEW REQUIRED | 2 | CASE-10005, CASE-10009 |
+
+| Violation Type | Count | Cases |
+|----------------|-------|-------|
+| TCPA (Consent) | 1 | CASE-10002 |
+| Frequency Limits | 1 | CASE-10003 |
+| Disputed Debt | 1 | CASE-10004 |
+| Time Window | 1 | CASE-10006 |
+| Proportionality | 1 | CASE-10007 |
+| Bankruptcy Stay | 1 | CASE-10010 |
+
+| Vulnerability Type | Count | Cases |
+|--------------------|-------|-------|
+| Medical Hardship + Elderly | 1 | CASE-10005 |
+| Language Barrier | 1 | CASE-10009 |
+| Financial Hardship (Bankruptcy) | 1 | CASE-10010 |
+
+---
+
+## Usage in Demo
+
+**For Live Demo**:
+- Use **CASE-10004** (disputed debt) or **CASE-10002** (TCPA) for "Blocked Action" scenario
+- Use **CASE-10005** (vulnerable debtor) for "Review Required" scenario
+- Use **CASE-10001** or **CASE-10008** for "Allowed Action" success case
+
+**For Testing**:
+- Import all 10 cases into PostgreSQL `cases` table
+- Run compliance API against each case
+- Verify decisions match expected outputs
+- Validate audit trail completeness

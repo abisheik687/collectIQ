@@ -8,15 +8,24 @@ services:
     environment:
       POSTGRES_DB: collectiq
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
-      - "5432:5432"
+      - "5432:5432 "
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - collectiq-network
+    # P2 FIX: Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,8 +38,14 @@ services:
       - "6379:6379"
     networks:
       - collectiq-network
+    # P2 FIX: Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -51,8 +66,14 @@ services:
       - ./ml-models:/app
     networks:
       - collectiq-network
+    # P2 FIX: Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -75,7 +96,7 @@ services:
       JWT_SECRET: collectiq-jwt-secret-change-in-production
       JWT_EXPIRES_IN: 7d
       ML_API_URL: http://ml-api:8000
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: ${FRONTEND_URL:-http://localhost:3000}
     ports:
       - "5000:5000"
     depends_on:
@@ -87,8 +108,14 @@ services:
         condition: service_healthy
     networks:
       - collectiq-network
+    # P2 FIX: Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/api/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -107,6 +134,12 @@ services:
       - backend
     networks:
       - collectiq-network
+    # P2 FIX: Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
 networks:
   collectiq-network:

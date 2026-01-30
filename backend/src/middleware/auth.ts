@@ -24,9 +24,16 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
         }
 
         const token = authHeader.substring(7);
-        const secret = process.env.JWT_SECRET || 'your-secret-key';
 
-        const decoded = jwt.verify(token, secret) as {
+        // P2 FIX: Validate JWT_SECRET in production
+        const secret = process.env.JWT_SECRET;
+        if (!secret && process.env.NODE_ENV === 'production') {
+            logger.error('FATAL: JWT_SECRET must be set in production');
+            throw new Error('JWT_SECRET configuration missing');
+        }
+        const jwtSecret = secret || 'your-secret-key';
+
+        const decoded = jwt.verify(token, jwtSecret) as {
             id: number;
             email: string;
             name: string;

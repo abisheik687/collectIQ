@@ -45,6 +45,30 @@ export async function initializeDatabase(): Promise<void> {
                 agency: 'Elite Collections Inc',
                 isActive: true,
             },
+            {
+                email: 'dca3@agency.com',
+                password: dcaPassword,
+                name: 'DCA Collector 3',
+                role: 'dca',
+                agency: 'Swift Debt Recovery',
+                isActive: true,
+            },
+            {
+                email: 'dca4@agency.com',
+                password: dcaPassword,
+                name: 'DCA Collector 4',
+                role: 'dca',
+                agency: 'Global Recovery Partners',
+                isActive: true,
+            },
+            {
+                email: 'dca5@agency.com',
+                password: dcaPassword,
+                name: 'DCA Collector 5',
+                role: 'dca',
+                agency: 'Apex Collections Group',
+                isActive: true,
+            },
         ]);
 
         logger.info('Demo users created');

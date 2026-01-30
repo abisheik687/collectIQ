@@ -10,7 +10,7 @@ const router = Router();
 router.use(authenticate);
 
 // Recovery rate analytics
-router.get('/recovery-rate', async (req: AuthRequest, res: Response, next) => {
+router.get('/recovery-rate', async (_req: AuthRequest, res: Response, next) => {
     try {
         const totalCases = await Case.count();
         const resolvedCases = await Case.count({ where: { status: 'resolved' } });
@@ -39,7 +39,7 @@ router.get('/recovery-rate', async (req: AuthRequest, res: Response, next) => {
 });
 
 // Aging bucket distribution
-router.get('/aging-buckets', async (req: AuthRequest, res: Response, next) => {
+router.get('/aging-buckets', async (_req: AuthRequest, res: Response, next) => {
     try {
         const buckets = await sequelize.query(`
       SELECT 
@@ -64,7 +64,7 @@ router.get('/aging-buckets', async (req: AuthRequest, res: Response, next) => {
 });
 
 // SLA compliance metrics
-router.get('/sla-compliance', async (req: AuthRequest, res: Response, next) => {
+router.get('/sla-compliance', async (_req: AuthRequest, res: Response, next) => {
     try {
         const onTrack = await Case.count({ where: { slaStatus: 'on_track' } });
         const warning = await Case.count({ where: { slaStatus: 'warning' } });
@@ -86,7 +86,7 @@ router.get('/sla-compliance', async (req: AuthRequest, res: Response, next) => {
 });
 
 // DCA performance comparison
-router.get('/dca-performance', async (req: AuthRequest, res: Response, next) => {
+router.get('/dca-performance', async (_req: AuthRequest, res: Response, next) => {
     try {
         const performance = await sequelize.query(`
       SELECT 
@@ -108,7 +108,7 @@ router.get('/dca-performance', async (req: AuthRequest, res: Response, next) => 
 });
 
 // Status distribution
-router.get('/status-distribution', async (req: AuthRequest, res: Response, next) => {
+router.get('/status-distribution', async (_req: AuthRequest, res: Response, next) => {
     try {
         const distribution = await Case.findAll({
             attributes: [
@@ -125,7 +125,7 @@ router.get('/status-distribution', async (req: AuthRequest, res: Response, next)
 });
 
 // Priority distribution
-router.get('/priority-distribution', async (req: AuthRequest, res: Response, next) => {
+router.get('/priority-distribution', async (_req: AuthRequest, res: Response, next) => {
     try {
         const distribution = await Case.findAll({
             attributes: [

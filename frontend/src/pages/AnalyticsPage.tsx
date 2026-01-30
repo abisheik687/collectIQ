@@ -1,17 +1,31 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
-import { Bar, Line, Pie } from 'react-chartjs-2';
+import { Bar, Pie } from 'react-chartjs-2';
+import { RefreshCw } from 'lucide-react';
+import { useState } from 'react';
 import api from '../services/api';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
 
 export default function AnalyticsPage() {
+    const queryClient = useQueryClient();
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        await queryClient.invalidateQueries({ queryKey: ['analytics-aging'] });
+        await queryClient.invalidateQueries({ queryKey: ['analytics-status'] });
+        await queryClient.invalidateQueries({ queryKey: ['analytics-dca'] });
+        setTimeout(() => setIsRefreshing(false), 1000);
+    };
+
     const { data: agingBuckets } = useQuery({
         queryKey: ['analytics-aging'],
         queryFn: async () => {
             const response = await api.get('/analytics/aging-buckets');
             return response.data.buckets;
         },
+        refetchInterval: 15000, // Auto-refresh every 15 seconds
     });
 
     const { data: statusDist } = useQuery({
@@ -20,6 +34,7 @@ export default function AnalyticsPage() {
             const response = await api.get('/analytics/status-distribution');
             return response.data.distribution;
         },
+        refetchInterval: 15000, // Auto-refresh every 15 seconds
     });
 
     const { data: dcaPerformance } = useQuery({
@@ -28,6 +43,7 @@ export default function AnalyticsPage() {
             const response = await api.get('/analytics/dca-performance');
             return response.data.performance;
         },
+        refetchInterval: 15000, // Auto-refresh every 15 seconds
     });
 
     const agingChartData = {
@@ -78,7 +94,55 @@ export default function AnalyticsPage() {
 
     return (
         <div>
-            <h1 style={{ marginBottom: '2rem' }}>Analytics Dashboard</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <h1 style={{ margin: 0 }}>Analytics Dashboard</h1>
+                <button
+                    onClick={handleRefresh}
+                    disabled={isRefreshing}
+                    className="btn btn-primary"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.75rem 1.5rem',
+                        backgroundColor: isRefreshing ? '#6B7280' : '#7C3AED',
+                        border: 'none',
+                        borderRadius: '0.5rem',
+                        color: 'white',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        cursor: isRefreshing ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                        if (!isRefreshing) {
+                            e.currentTarget.style.backgroundColor = '#6D28D9';
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                        }
+                    }}
+                    onMouseLeave={(e) => {
+                        if (!isRefreshing) {
+                            e.currentTarget.style.backgroundColor = '#7C3AED';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                        }
+                    }}
+                >
+                    <RefreshCw
+                        size={16}
+                        style={{
+                            animation: isRefreshing ? 'spin 1s linear infinite' : 'none'
+                        }}
+                    />
+                    {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+                </button>
+            </div>
+
+            <style>{`
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
 
             <div className="grid grid-cols-2" style={{ marginBottom: '2rem' }}>
                 <div className="card">

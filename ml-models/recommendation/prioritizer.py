@@ -85,25 +85,95 @@ class CasePrioritizer:
     
     def recommend_dca_assignment(self, case, available_dcas):
         """
-        Recommend DCA assignment based on case characteristics and DCA performance
+        Smart DCA Assignment - matches cases to best-fit DCA
         
         Args:
             case: dict with case features
-            available_dcas: list of dicts with DCA info (name, success_rate, current_load)
+            available_dcas: list of dicts with DCA info (id, name, success_rate, current_load, specialization)
         
         Returns:
-            recommended DCA
+            dict with recommended DCA and explanation
         """
         if not available_dcas:
             return None
         
         priority_score = self.calculate_priority_score(case)
+        case_amount = case.get('amount', 0)
         
-        # For high priority cases, assign to best performing DCA
-        if priority_score >= 75:
-            best_dca = max(available_dcas, key=lambda x: x.get('success_rate', 0))
-            return best_dca
+        # Score each DCA based on fit
+        dca_scores = []
+        for dca in available_dcas:
+            score = 0
+            reasons = []
+            
+            # Factor 1: Success rate (40% weight)
+            success_rate = dca.get('success_rate', 50) / 100
+            score += success_rate * 40
+            if success_rate > 0.7:
+                reasons.append(f"{dca['name']} has {success_rate*100:.0f}% success rate")
+            
+            # Factor 2: Workload capacity (30% weight)
+            current_load = dca.get('current_load', 0)
+            max_load = dca.get('max_load', 50)
+            capacity = 1 - (current_load / max_load)
+            score += capacity * 30
+            if capacity > 0.5:
+                reasons.append(f"Available capacity ({int(capacity*100)}%)")
+            
+            # Factor 3: Case complexity match (30% weight)
+            specialization = dca.get('specialization', 'general')
+            
+            # High-value cases → specialist DCAs
+            if priority_score >= 75 and specialization == 'high_value':
+                score += 30
+                reasons.append("Specializes in high-value cases")
+            # Complex cases → experienced DCAs
+            elif priority_score >= 50 and specialization == 'complex':
+                score += 25
+                reasons.append("Experienced with complex cases")
+            # Standard cases → general DCAs
+            elif specialization == 'general':
+                score += 20
+                reasons.append("General case handler")
+            else:
+                score += 15
+            
+            dca_scores.append({
+                'dca_id': dca.get('id'),
+                'dca_name': dca.get('name'),
+                'score': round(score, 2),
+                'reasons': reasons,
+                'success_rate': success_rate * 100,
+                'current_load': current_load
+            })
         
-        # For medium/low priority, balance load
-        least_loaded = min(available_dcas, key=lambda x: x.get('current_load', 0))
-        return least_loaded
+        # Sort by score (descending)
+        dca_scores.sort(key=lambda x: x['score'], reverse=True)
+        
+        best_match = dca_scores[0]
+        
+        return {
+            'recommended_dca_id': best_match['dca_id'],
+            'recommended_dca_name': best_match['dca_name'],
+            'match_score': best_match['score'],
+            'reasons': best_match['reasons'],
+            'alternative': dca_scores[1] if len(dca_scores) > 1 else None,
+            'explanation': self._format_assignment_explanation(case, best_match)
+        }
+    
+    def _format_assignment_explanation(self, case, dca_match):
+        """Generate human-readable explanation for DCA assignment"""
+        priority = case.get('priority', 'medium')
+        amount = case.get('amount', 0)
+        
+        explanation = f"Assigned to {dca_match['dca_name']} because: "
+        explanation += " | ".join(dca_match['reasons'])
+        
+        if priority == 'high':
+            explanation += " | High-priority case requires experienced handler"
+        
+        if amount > 10000:
+            explanation += f" | High-value case (${amount:,.2f}) needs specialized attention"
+        
+        return explanation
+

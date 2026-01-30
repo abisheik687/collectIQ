@@ -1,0 +1,118 @@
+
+// Bulk upload cases from CSV (Enterprise only)
+const upload = multer({ dest: path.join(__dirname, '../../uploads') });
+
+router.post('/bulk-upload', authorize('enterprise'), upload.single('file'), async (req: AuthRequest, res: Response, next) => {
+    try {
+        if (!req.file) {
+            throw new AppError('No file uploaded', 400);
+        }
+
+        const filePath = req.file.path;
+        const results: any[] = [];
+        const errors: string[] = [];
+        let created = 0;
+
+        // Parse CSV
+        await new Promise((resolve, reject) => {
+            fs.createReadStream(filePath)
+                .pipe(csvParser())
+                .on('data', (row) => {
+                    results.push(row);
+                })
+                .on('end', resolve)
+                .on('error', reject);
+        });
+
+        // Delete uploaded file
+        fs.unlinkSync(filePath);
+
+        // Validate and create cases
+        for (let i = 0; i < results.length; i++) {
+            const row = results[i];
+            
+            // Validate required fields
+            if (!row.customerName || !row.customerEmail || !row.amount || !row.dueDate) {
+                errors.push(`Row ${i + 2}: Missing required fields`);
+                continue;
+            }
+
+            try {
+                const amount = parseFloat(row.amount);
+                const dueDate = new Date(row.dueDate);
+                const today = new Date();
+                const overdueDays = Math.max(0, Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)));
+
+                // Generate case number
+                const caseNumber = `CASE-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+                // Get ML predictions
+                const prediction = await MLService.predictPaymentProbability({
+                    overdueDays,
+                    amount,
+                    historicalPayments: 0,
+                    contactFrequency: 0,
+                });
+
+                // Create case
+                const caseRecord = await Case.create({
+                    caseNumber,
+                    accountNumber: row.accountNumber || `ACC-${Date.now()}`,
+                    customerName: row.customerName,
+                    customerEmail: row.customerEmail,
+                    amount,
+                    overdueDays,
+                    status: 'new',
+                    priority: row.priority || prediction.priority,
+                    riskScore: prediction.riskScore,
+                    paymentProbability: prediction.paymentProbability,
+                    contactCount: 0,
+                    createdBy: req.user!.id,
+                });
+
+                // Initialize workflow
+                await WorkflowEngine.initializeWorkflow(caseRecord.id);
+
+                // If DCA specified, assign immediately
+                if (row.assignedDCA) {
+                    const dcaId = row.assignedDCA === 'Premium Recovery Solutions' ? 2 : 3;
+                    await caseRecord.update({
+                        assignedDcaId: dcaId,
+                        assignedDcaName: row.assignedDCA,
+                        status: 'assigned'
+                    });
+                    await WorkflowEngine.transitionStage(caseRecord.id, 'contact');
+                }
+
+                created++;
+            } catch (error: any) {
+                errors.push(`Row ${i + 2}: ${error.message}`);
+            }
+        }
+
+        // Audit log
+        await AuditService.log({
+            action: 'BULK_UPLOAD_CASES',
+            entityType: 'Case',
+            entityId: null,
+            userId: req.user!.id,
+            userName: req.user!.name,
+            afterState: { created, errors: errors.length, total: results.length },
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent'),
+        });
+
+        res.json({
+            success: true,
+            created,
+            errors,
+            total: results.length
+        });
+    } catch (error) {
+        // Cleanup uploaded file if exists
+        if (req.file?.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+        next(error);
+    }
+});

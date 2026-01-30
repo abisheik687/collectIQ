@@ -66,8 +66,12 @@ router.post('/login', async (req, res, next) => {
             throw new AppError('Account is disabled', 403);
         }
 
-        // Generate JWT
-        const secret = process.env.JWT_SECRET || 'your-secret-key';
+        // Generate JWT - P2 FIX: Validate JWT_SECRET in production
+        const secret = process.env.JWT_SECRET;
+        if (!secret && process.env.NODE_ENV === 'production') {
+            throw new AppError('JWT_SECRET configuration error', 500);
+        }
+        const jwtSecret = secret || 'your-secret-key';
         const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
 
         const token = jwt.sign(
@@ -78,7 +82,7 @@ router.post('/login', async (req, res, next) => {
                 role: user.role,
                 agency: user.agency,
             },
-            secret,
+            jwtSecret,
             { expiresIn }
         );
 

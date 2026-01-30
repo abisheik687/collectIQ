@@ -8,6 +8,10 @@ import { AppError } from '../middleware/errorHandler';
 import AuditService from '../services/AuditService';
 import WorkflowEngine from '../services/WorkflowEngine';
 import MLService from '../services/MLService';
+import multer from 'multer';
+import csvParser from 'csv-parser';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const router = Router();
 
@@ -146,6 +150,123 @@ router.post('/', authorize('enterprise'), async (req: AuthRequest, res: Response
 
         res.status(201).json({ case: caseRecord });
     } catch (error) {
+        next(error);
+    }
+});
+
+// Bulk upload cases from CSV (Enterprise only)
+const upload = multer({ dest: path.join(__dirname, '../../uploads') });
+
+router.post('/bulk-upload', authorize('enterprise'), upload.single('file'), async (req: AuthRequest, res: Response, next) => {
+    try {
+        if (!req.file) {
+            throw new AppError('No file uploaded', 400);
+        }
+
+        const filePath = req.file.path;
+        const results: any[] = [];
+        const errors: string[] = [];
+        let created = 0;
+
+        // Parse CSV
+        await new Promise((resolve, reject) => {
+            fs.createReadStream(filePath)
+                .pipe(csvParser())
+                .on('data', (row) => results.push(row))
+                .on('end', resolve)
+                .on('error', reject);
+        });
+
+        // Delete uploaded file
+        fs.unlinkSync(filePath);
+
+        // Wrap case creation in transaction for atomicity (P1 FIX)
+        const transaction = await sequelize.transaction();
+
+        try {
+            // Validate and create cases
+            for (let i = 0; i < results.length; i++) {
+                const row = results[i];
+
+                // Validate required fields
+                if (!row.customerName || !row.customerEmail || !row.amount || !row.dueDate) {
+                    errors.push(`Row ${i + 2}: Missing required fields`);
+                    continue;
+                }
+
+                try {
+                    const amount = parseFloat(row.amount);
+                    const dueDate = new Date(row.dueDate);
+                    const today = new Date();
+                    const overdueDays = Math.max(0, Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)));
+
+                    // Generate case number
+                    const caseNumber = `CASE-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+                    // Get ML predictions
+                    const prediction = await MLService.predictPaymentProbability({
+                        overdueDays,
+                        amount,
+                        historicalPayments: 0,
+                        contactFrequency: 0,
+                    });
+
+                    // Create case within transaction
+                    const caseRecord = await Case.create({
+                        caseNumber,
+                        accountNumber: row.accountNumber || `ACC-${Date.now()}`,
+                        customerName: row.customerName,
+                        customerEmail: row.customerEmail,
+                        amount,
+                        overdueDays,
+                        status: 'new',
+                        priority: row.priority || prediction.priority,
+                        riskScore: prediction.riskScore,
+                        paymentProbability: prediction.paymentProbability,
+                        contactCount: 0,
+                        createdBy: req.user!.id,
+                    }, { transaction });
+
+                    // Initialize workflow within transaction
+                    await WorkflowEngine.initializeWorkflow(caseRecord.id, transaction);
+
+                    created++;
+                } catch (error: any) {
+                    errors.push(`Row ${i + 2}: ${error.message}`);
+                    // Rollback transaction on first error to maintain data integrity
+                    await transaction.rollback();
+                    throw new AppError(`Bulk upload failed at row ${i + 2}: ${error.message}`, 400);
+                }
+            }
+
+            // Commit transaction if all successful
+            await transaction.commit();
+        } catch (error: any) {
+            // Ensure rollback if not already done
+            if (!transaction.finished) {
+                await transaction.rollback();
+            }
+            throw error;
+        }
+
+        // Audit log
+        await AuditService.log({
+            action: 'BULK_UPLOAD_CASES',
+            entityType: 'Case',
+            entityId: null as any,
+            userId: req.user!.id,
+            userName: req.user!.name,
+            afterState: { created, errors: errors.length, total: results.length },
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent'),
+        });
+
+        res.json({ success: true, created, errors, total: results.length });
+    } catch (error) {
+        // Cleanup uploaded file if exists
+        if (req.file?.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         next(error);
     }
 });
