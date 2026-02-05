@@ -109,8 +109,10 @@ const startServer = async () => {
         await sequelize.authenticate();
         logger.info('Database connection established successfully');
 
-        // Disable FK checks for SQLite init
-        await sequelize.query('PRAGMA foreign_keys = OFF;');
+        // Disable FK checks for SQLite init (not needed for PostgreSQL)
+        if (sequelize.getDialect() === 'sqlite') {
+            await sequelize.query('PRAGMA foreign_keys = OFF;');
+        }
 
         // Sync database models (standard sync for in-memory)
         try {
