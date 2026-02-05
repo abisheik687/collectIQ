@@ -21,8 +21,8 @@ class AuditLog extends Model<AuditLogAttributes, AuditLogCreationAttributes> imp
     public id!: number;
     public action!: string;
     public entityType!: string;
-    public entityId!: number;
-    public userId!: number;
+    public entityId!: string | number; // Support both
+    public userId?: number; // Optional
     public userName!: string;
     public beforeState?: any;
     public afterState?: any;
@@ -49,12 +49,12 @@ AuditLog.init(
             allowNull: false,
         },
         entityId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         userId: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
         },
         userName: {
             type: DataTypes.STRING,

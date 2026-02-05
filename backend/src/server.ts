@@ -114,7 +114,7 @@ const startServer = async () => {
 
         // Sync database models (standard sync for in-memory)
         try {
-            await sequelize.sync();
+            await sequelize.sync({ alter: true });
             logger.info('Database models synchronized');
         } catch (syncError) {
             logger.error('Sync failed:', syncError);
@@ -163,6 +163,9 @@ process.on('SIGINT', async () => {
     process.exit(0);
 });
 
-startServer();
+// Only start server if run directly (not imported)
+if (require.main === module) {
+    startServer();
+}
 
 export default app;

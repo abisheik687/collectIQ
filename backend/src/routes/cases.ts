@@ -95,7 +95,7 @@ router.get('/:id', async (req: AuthRequest, res: Response, next) => {
 });
 
 // Create case (Enterprise only)
-router.post('/', authorize('enterprise'), async (req: AuthRequest, res: Response, next) => {
+router.post('/', authorize('fedex_admin'), async (req: AuthRequest, res: Response, next) => {
     try {
         const {
             accountNumber,
@@ -159,7 +159,7 @@ router.post('/', authorize('enterprise'), async (req: AuthRequest, res: Response
 // Bulk upload cases from CSV (Enterprise only)
 const upload = multer({ dest: path.join(__dirname, '../../uploads') });
 
-router.post('/bulk-upload', authorize('enterprise'), upload.single('file'), async (req: AuthRequest, res: Response, next) => {
+router.post('/bulk-upload', authorize('fedex_admin'), upload.single('file'), async (req: AuthRequest, res: Response, next) => {
     try {
         if (!req.file) {
             throw new AppError('No file uploaded', 400);
@@ -320,7 +320,7 @@ router.put('/:id', async (req: AuthRequest, res: Response, next) => {
 });
 
 // Assign case to DCA (Enterprise only)
-router.post('/:id/assign', authorize('enterprise'), async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/assign', authorize('fedex_admin'), async (req: AuthRequest, res: Response, next) => {
     try {
         const { dcaId, dcaName } = req.body;
 
