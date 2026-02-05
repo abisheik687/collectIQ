@@ -6,9 +6,11 @@ export interface UserAttributes {
     email: string;
     password: string;
     name: string;
-    role: 'enterprise' | 'dca';
-    agency?: string;
+    role: 'fedex_admin' | 'fedex_user' | 'dca_admin' | 'dca_collector' | 'audit';
+    dcaVendorId?: number;
+    permissions: string[];
     isActive: boolean;
+    lastLogin?: Date;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -20,9 +22,11 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public email!: string;
     public password!: string;
     public name!: string;
-    public role!: 'enterprise' | 'dca';
-    public agency?: string;
+    public role!: 'fedex_admin' | 'fedex_user' | 'dca_admin' | 'dca_collector' | 'audit';
+    public dcaVendorId?: number;
+    public permissions!: string[];
     public isActive!: boolean;
+    public lastLogin?: Date;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -52,17 +56,31 @@ User.init(
             allowNull: false,
         },
         role: {
-            type: DataTypes.ENUM('enterprise', 'dca'),
+            type: DataTypes.ENUM('fedex_admin', 'fedex_user', 'dca_admin', 'dca_collector', 'audit'),
             allowNull: false,
-            defaultValue: 'dca',
+            defaultValue: 'dca_collector',
         },
-        agency: {
-            type: DataTypes.STRING,
+        dcaVendorId: {
+            type: DataTypes.INTEGER,
             allowNull: true,
+            references: {
+                model: 'dca_vendors',
+                key: 'id',
+            },
+            comment: 'Only for DCA users',
+        },
+        permissions: {
+            type: DataTypes.JSONB,
+            defaultValue: [],
+            comment: 'Array of permission strings for granular RBAC',
         },
         isActive: {
             type: DataTypes.BOOLEAN,
             defaultValue: true,
+        },
+        lastLogin: {
+            type: DataTypes.DATE,
+            allowNull: true,
         },
     },
     {

@@ -7,13 +7,23 @@ export interface CaseAttributes {
     accountNumber: string;
     customerName: string;
     amount: number;
+    currency: string;
     overdueDays: number;
-    status: 'new' | 'assigned' | 'in_progress' | 'follow_up' | 'escalated' | 'resolved' | 'closed';
+    invoiceDate: Date;
+    status: 'new' | 'assigned' | 'contacted' | 'promise_to_pay' | 'partial_paid' | 'in_progress' | 'follow_up' | 'escalated' | 'resolved' | 'refused' | 'closed';
     priority: 'high' | 'medium' | 'low';
-    riskScore?: number;
-    paymentProbability?: number;
+    dcaVendorId?: number;
+    assignedToUser?: number;
     assignedDcaId?: number;
     assignedDcaName?: string;
+    mlPaymentProbability?: number;
+    mlRiskScore?: 'high' | 'medium' | 'low';
+    customerDetails: {
+        email?: string;
+        phone?: string;
+        address?: string;
+        companyName?: string;
+    };
     slaDueDate?: Date;
     slaStatus?: 'on_track' | 'warning' | 'breached';
     contactCount: number;
@@ -33,13 +43,23 @@ class Case extends Model<CaseAttributes, CaseCreationAttributes> implements Case
     public accountNumber!: string;
     public customerName!: string;
     public amount!: number;
+    public currency!: string;
     public overdueDays!: number;
-    public status!: 'new' | 'assigned' | 'in_progress' | 'follow_up' | 'escalated' | 'resolved' | 'closed';
+    public invoiceDate!: Date;
+    public status!: 'new' | 'assigned' | 'contacted' | 'promise_to_pay' | 'partial_paid' | 'in_progress' | 'follow_up' | 'escalated' | 'resolved' | 'refused' | 'closed';
     public priority!: 'high' | 'medium' | 'low';
-    public riskScore?: number;
-    public paymentProbability?: number;
+    public dcaVendorId?: number;
+    public assignedToUser?: number;
     public assignedDcaId?: number;
     public assignedDcaName?: string;
+    public mlPaymentProbability?: number;
+    public mlRiskScore?: 'high' | 'medium' | 'low';
+    public customerDetails!: {
+        email?: string;
+        phone?: string;
+        address?: string;
+        companyName?: string;
+    };
     public slaDueDate?: Date;
     public slaStatus?: 'on_track' | 'warning' | 'breached';
     public contactCount!: number;
@@ -73,15 +93,25 @@ Case.init(
             allowNull: false,
         },
         amount: {
-            type: DataTypes.DECIMAL(12, 2),
+            type: DataTypes.DECIMAL(15, 2),
             allowNull: false,
+        },
+        currency: {
+            type: DataTypes.STRING(3),
+            allowNull: false,
+            defaultValue: 'USD',
         },
         overdueDays: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            comment: 'Days since invoice date',
+        },
+        invoiceDate: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
         },
         status: {
-            type: DataTypes.ENUM('new', 'assigned', 'in_progress', 'follow_up', 'escalated', 'resolved', 'closed'),
+            type: DataTypes.ENUM('new', 'assigned', 'contacted', 'promise_to_pay', 'partial_paid', 'in_progress', 'follow_up', 'escalated', 'resolved', 'refused', 'closed'),
             allowNull: false,
             defaultValue: 'new',
         },
@@ -90,21 +120,45 @@ Case.init(
             allowNull: false,
             defaultValue: 'medium',
         },
-        riskScore: {
-            type: DataTypes.DECIMAL(5, 2),
+        dcaVendorId: {
+            type: DataTypes.INTEGER,
             allowNull: true,
+            references: {
+                model: 'dca_vendors',
+                key: 'id',
+            },
         },
-        paymentProbability: {
-            type: DataTypes.DECIMAL(5, 2),
+        assignedToUser: {
+            type: DataTypes.INTEGER,
             allowNull: true,
+            references: {
+                model: 'users',
+                key: 'id',
+            },
         },
         assignedDcaId: {
             type: DataTypes.INTEGER,
             allowNull: true,
+            comment: 'ID of the assigned DCA user',
         },
         assignedDcaName: {
             type: DataTypes.STRING,
             allowNull: true,
+            comment: 'Name of the assigned DCA agency',
+        },
+        mlPaymentProbability: {
+            type: DataTypes.DECIMAL(5, 4),
+            allowNull: true,
+            comment: 'ML prediction score 0-1',
+        },
+        mlRiskScore: {
+            type: DataTypes.ENUM('high', 'medium', 'low'),
+            allowNull: true,
+        },
+        customerDetails: {
+            type: DataTypes.JSONB,
+            allowNull: false,
+            defaultValue: {},
         },
         slaDueDate: {
             type: DataTypes.DATE,

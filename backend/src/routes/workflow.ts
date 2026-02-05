@@ -118,7 +118,7 @@ router.get('/:caseId/allowed-actions', async (req: AuthRequest, res: Response) =
 router.get('/violations', async (req: AuthRequest, res: Response) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
@@ -168,7 +168,7 @@ router.get('/violations', async (req: AuthRequest, res: Response) => {
 router.get('/sop-adherence', async (req: AuthRequest, res: Response) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'

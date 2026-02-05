@@ -1,0 +1,111 @@
+caseNumber,accountNumber,customerName,customerEmail,customerPhone,amount,currency,overdueDays,status,priority,assignedDcaId,assignedDcaName,slaStatus,productType,region
+FX-2024-001,ACC-78945,Acme Corporation,billing@acme.com,555-0101,12500,USD,15,assigned,high,2,Premium Recovery Solutions,on_track,B2B Services,North
+FX-2024-002,ACC-78946,Global Logistics Inc,ap@globallog.com,555-0102,8900,USD,45,in_progress,medium,2,Premium Recovery Solutions,warning,Shipping,East
+FX-2024-003,ACC-78947,Tech Innovations LLC,finance@techinno.com,555-0103,25000,USD,95,assigned,high,2,Premium Recovery Solutions,breached,Software License,West
+FX-2024-004,ACC-78948,Retail Mart Co,payments@retailmart.com,555-0104,15600,USD,22,assigned,medium,2,Premium Recovery Solutions,on_track,Retail Goods,South
+FX-2024-005,ACC-78949,Manufacturing Pro,ar@mfgpro.com,555-0105,45000,USD,120,follow_up,critical,2,Premium Recovery Solutions,breached,Industrial Equipment,North
+FX-2024-006,ACC-78950,Service Solutions,billing@servicesol.com,555-0106,7800,USD,18,assigned,low,2,Premium Recovery Solutions,on_track,Consulting,East
+FX-2024-007,ACC-78951,Digital Media Group,payment@digitalmg.com,555-0107,11200,USD,67,in_progress,medium,2,Premium Recovery Solutions,warning,Marketing Services,West
+FX-2024-008,ACC-78952,Healthcare Systems,finance@healthsys.com,555-0108,33000,USD,105,assigned,high,2,Premium Recovery Solutions,breached,Medical Equipment,South
+FX-2024-009,ACC-78953,Education First,billing@edufirst.com,555-0109,9500,USD,12,assigned,medium,2,Premium Recovery Solutions,on_track,Educational Services,North
+FX-2024-010,ACC-78954,Construction Ltd,ap@constructltd.com,555-0110,52000,USD,88,follow_up,critical,2,Premium Recovery Solutions,breached,Construction Materials,East
+FX-2024-011,ACC-78955,Food Distributors,billing@fooddist.com,555-0111,14300,USD,25,assigned,medium,2,Premium Recovery Solutions,on_track,Food & Beverage,West
+FX-2024-012,ACC-78956,Auto Parts Inc,finance@autoparts.com,555-0112,19800,USD,58,in_progress,high,2,Premium Recovery Solutions,warning,Automotive,South
+FX-2024-013,ACC-78957,Energy Solutions,ar@energysol.com,555-0113,67000,USD,130,assigned,critical,2,Premium Recovery Solutions,breached,Utilities,North
+FX-2024-014,ACC-78958,Fashion Retail,payments@fashionret.com,555-0114,8200,USD,19,assigned,low,2,Premium Recovery Solutions,on_track,Apparel,East
+FX-2024-015,ACC-78959,Telecom Services,billing@telecom.com,555-0115,28500,USD,72,follow_up,medium,2,Premium Recovery Solutions,warning,Telecommunications,West
+FX-2024-016,ACC-78960,Pharmaceutical Co,finance@pharmaco.com,555-0116,41000,USD,98,assigned,high,2,Premium Recovery Solutions,breached,Pharmaceuticals,South
+FX-2024-017,ACC-78961,Insurance Group,ap@insgroup.com,555-0117,16700,USD,14,assigned,medium,2,Premium Recovery Solutions,on_track,Insurance,North
+FX-2024-018,ACC-78962,Real Estate Holdings,billing@realestate.com,555-0118,89000,USD,110,in_progress,critical,2,Premium Recovery Solutions,breached,Real Estate,East
+FX-2024-019,ACC-78963,Transportation Inc,payments@transport.com,555-0119,12100,USD,31,assigned,medium,2,Premium Recovery Solutions,on_track,Transportation,West
+FX-2024-020,ACC-78964,Hospitality Services,finance@hospital.com,555-0120,22400,USD,64,follow_up,high,2,Premium Recovery Solutions,warning,Hospitality,South
+FX-2024-021,ACC-78965,Legal Advisors,billing@legaladv.com,555-0121,18900,USD,102,assigned,medium,2,Premium Recovery Solutions,breached,Legal Services,North
+FX-2024-022,ACC-78966,Engineering Firm,ar@engfirm.com,555-0122,35600,USD,11,assigned,low,2,Premium Recovery Solutions,on_track,Engineering,East
+FX-2024-023,ACC-78967,Marketing Agency,payments@marketag.com,555-0123,9700,USD,48,in_progress,medium,2,Premium Recovery Solutions,warning,Advertising,West
+FX-2024-024,ACC-78968,Financial Services,finance@finserv.com,555-0124,71000,USD,125,assigned,critical,2,Premium Recovery Solutions,breached,Financial Services,South
+FX-2024-025,ACC-78969,Agriculture Co,billing@agricult.com,555-0125,13800,USD,23,assigned,medium,2,Premium Recovery Solutions,on_track,Agriculture,North
+FX-2024-026,ACC-78970,Entertainment Inc,ap@entertain.com,555-0126,26500,USD,76,follow_up,high,2,Premium Recovery Solutions,warning,Entertainment,East
+FX-2024-027,ACC-78971,Security Systems,payments@security.com,555-0127,19200,USD,91,assigned,medium,2,Premium Recovery Solutions,breached,Security,West
+FX-2024-028,ACC-78972,Chemical Industries,finance@chemical.com,555-0128,44000,USD,16,assigned,high,2,Premium Recovery Solutions,on_track,Chemicals,South
+FX-2024-029,ACC-78973,Aerospace Tech,billing@aerospace.com,555-0129,95000,USD,135,in_progress,critical,2,Premium Recovery Solutions,breached,Aerospace,North
+FX-2024-030,ACC-78974,Printing Services,ar@printing.com,555-0130,7300,USD,27,assigned,low,2,Premium Recovery Solutions,on_track,Printing,East
+FX-2024-031,ACC-78975,Packaging Solutions,payments@packaging.com,555-0131,15400,USD,53,assigned,medium,2,Premium Recovery Solutions,warning,Packaging,West
+FX-2024-032,ACC-78976,Textiles Manufacturing,finance@textiles.com,555-0132,32100,USD,107,follow_up,high,2,Premium Recovery Solutions,breached,Textiles,South
+FX-2024-033,ACC-78977,Electronics Wholesale,billing@electronics.com,555-0133,21600,USD,20,assigned,medium,2,Premium Recovery Solutions,on_track,Electronics,North
+FX-2024-034,ACC-78978,Furniture Depot,ap@furniture.com,555-0134,17900,USD,69,in_progress,medium,2,Premium Recovery Solutions,warning,Furniture,East
+FX-2024-035,ACC-78979,Biotechnology Lab,payments@biotech.com,555-0135,58000,USD,115,assigned,critical,2,Premium Recovery Solutions,breached,Biotechnology,West
+FX-2024-036,ACC-78980,Sports Equipment,finance@sportseq.com,555-0136,10200,USD,13,assigned,low,2,Premium Recovery Solutions,on_track,Sports & Recreation,South
+FX-2024-037,ACC-78981,Office Supplies,billing@officesup.com,555-0137,6800,USD,41,assigned,medium,2,Premium Recovery Solutions,warning,Office Products,North
+FX-2024-038,ACC-78982,Environmental Services,ar@envserv.com,555-0138,29700,USD,82,follow_up,high,2,Premium Recovery Solutions,breached,Environmental,East
+FX-2024-039,ACC-78983,Media Production,payments@mediaprod.com,555-0139,14500,USD,29,assigned,medium,2,Premium Recovery Solutions,on_track,Media,West
+FX-2024-040,ACC-78984,Renewable Energy,finance@renewable.com,555-0140,73000,USD,118,in_progress,critical,2,Premium Recovery Solutions,breached,Energy,South
+FX-2024-041,ACC-78985,Consulting Group,billing@consultgrp.com,555-0141,11900,USD,17,assigned,medium,2,Premium Recovery Solutions,on_track,Business Consulting,North
+FX-2024-042,ACC-78986,Data Analytics,ap@dataanalytics.com,555-0142,24800,USD,62,assigned,high,2,Premium Recovery Solutions,warning,Technology,East
+FX-2024-043,ACC-78987,Cloud Services,payments@cloudserv.com,555-0143,38500,USD,96,follow_up,high,2,Premium Recovery Solutions,breached,IT Services,West
+FX-2024-044,ACC-78988,Mobile Solutions,finance@mobilesol.com,555-0144,16300,USD,21,assigned,medium,2,Premium Recovery Solutions,on_track,Mobile Technology,South
+FX-2024-045,ACC-78989,E-commerce Platform,billing@ecommerce.com,555-0145,27600,USD,74,in_progress,high,2,Premium Recovery Solutions,warning,E-commerce,North
+FX-2024-046,ACC-78990,Gaming Studio,ar@gamingstudio.com,555-0146,19400,USD,104,assigned,medium,2,Premium Recovery Solutions,breached,Gaming,East
+FX-2024-047,ACC-78991,Social Media Inc,payments@socialmedia.com,555-0147,12700,USD,9,assigned,low,2,Premium Recovery Solutions,on_track,Social Media,West
+FX-2024-048,ACC-78992,AI Research Lab,finance@airesearch.com,555-0148,64000,USD,128,follow_up,critical,2,Premium Recovery Solutions,breached,Research & Development,South
+FX-2024-049,ACC-78993,Robotics Corp,billing@robotics.com,555-0149,47000,USD,35,assigned,high,2,Premium Recovery Solutions,on_track,Robotics,North
+FX-2024-050,ACC-78994,Blockchain Tech,ap@blockchain.com,555-0150,31200,USD,81,in_progress,medium,2,Premium Recovery Solutions,warning,FinTech,East
+FX-2024-051,ACC-78995,Virtual Reality,payments@virtualr.com,555-0151,22900,USD,112,assigned,high,2,Premium Recovery Solutions,breached,Entertainment Tech,West
+FX-2024-052,ACC-78996,Cybersecurity Firm,finance@cybersec.com,555-0152,39800,USD,26,assigned,high,2,Premium Recovery Solutions,on_track,Cybersecurity,South
+FX-2024-053,ACC-78997,IoT Solutions,billing@iotsol.com,555-0153,18600,USD,57,follow_up,medium,2,Premium Recovery Solutions,warning,IoT,North
+FX-2024-054,ACC-78998,Smart Home Tech,ar@smarthome.com,555-0154,13400,USD,99,assigned,medium,2,Premium Recovery Solutions,breached,Consumer Electronics,East
+FX-2024-055,ACC-78999,Wearable Devices,payments@wearable.com,555-0155,15100,USD,18,assigned,low,2,Premium Recovery Solutions,on_track,Wearables,West
+FX-2024-056,ACC-79000,Drone Services,finance@droneserv.com,555-0156,28300,USD,71,in_progress,high,2,Premium Recovery Solutions,warning,Aviation Services,South
+FX-2024-057,ACC-79001,3D Printing Co,billing@3dprinting.com,555-0157,21800,USD,108,assigned,medium,2,Premium Recovery Solutions,breached,Manufacturing,North
+FX-2024-058,ACC-79002,Nanotechnology,ap@nanotech.com,555-0158,55000,USD,14,assigned,high,2,Premium Recovery Solutions,on_track,Advanced Materials,East
+FX-2024-059,ACC-79003,Quantum Computing,payments@quantum.com,555-0159,86000,USD,122,follow_up,critical,2,Premium Recovery Solutions,breached,Quantum Tech,West
+FX-2024-060,ACC-79004,Gene Therapy Lab,finance@genetherapy.com,555-0160,49000,USD,38,assigned,high,2,Premium Recovery Solutions,on_track,Biotechnology,South
+FX-2024-061,ACC-79005,Space Technology,billing@spacetech.com,555-0161,125000,USD,93,in_progress,critical,2,Premium Recovery Solutions,breached,Aerospace,North
+FX-2024-062,ACC-79006,Marine Sciences,ar@marinescience.com,555-0162,17200,USD,24,assigned,medium,2,Premium Recovery Solutions,on_track,Research,East
+FX-2024-063,ACC-79007,Clean Water Solutions,payments@cleanwater.com,555-0163,33700,USD,66,assigned,high,2,Premium Recovery Solutions,warning,Environmental,West
+FX-2024-064,ACC-79008,Solar Power Inc,finance@solarpower.com,555-0164,42100,USD,101,follow_up,high,2,Premium Recovery Solutions,breached,Renewable Energy,South
+FX-2024-065,ACC-79009,Wind Energy Co,billing@windenergy.com,555-0165,36500,USD,19,assigned,medium,2,Premium Recovery Solutions,on_track,Energy,North
+FX-2024-066,ACC-79010,EV Manufacturing,ap@evmanuf.com,555-0166,78000,USD,77,in_progress,critical,2,Premium Recovery Solutions,warning,Automotive,East
+FX-2024-067,ACC-79011,Battery Tech,payments@batterytech.com,555-0167,29400,USD,119,assigned,high,2,Premium Recovery Solutions,breached,Energy Storage,West
+FX-2024-068,ACC-79012,Green Building,finance@greenbuilding.com,555-0168,44600,USD,28,assigned,high,2,Premium Recovery Solutions,on_track,Construction,South
+FX-2024-069,ACC-79013,Urban Planning,billing@urbanplan.com,555-0169,23800,USD,54,assigned,medium,2,Premium Recovery Solutions,warning,Urban Development,North
+FX-2024-070,ACC-79014,Smart Cities,ar@smartcities.com,555-0170,61000,USD,97,follow_up,critical,2,Premium Recovery Solutions,breached,Infrastructure,East
+FX-2024-071,ACC-79015,Public Transport,payments@publictrans.com,555-0171,35900,USD,15,assigned,medium,2,Premium Recovery Solutions,on_track,Transportation,West
+FX-2024-072,ACC-79016,Logistics Tech,finance@logisticstech.com,555-0172,26700,USD,68,in_progress,high,2,Premium Recovery Solutions,warning,Supply Chain,South
+FX-2024-073,ACC-79017,Warehouse Automation,billing@warehouse.com,555-0173,48200,USD,111,assigned,high,2,Premium Recovery Solutions,breached,Automation,North
+FX-2024-074,ACC-79018,Fleet Management,ap@fleetmgmt.com,555-0174,19700,USD,22,assigned,medium,2,Premium Recovery Solutions,on_track,Transportation,East
+FX-2024-075,ACC-79019,Delivery Services,payments@deliveryserv.com,555-0175,14900,USD,49,assigned,medium,2,Premium Recovery Solutions,warning,Logistics,West
+FX-2024-076,ACC-79020,Cold Chain Logistics,finance@coldchain.com,555-0176,37400,USD,89,follow_up,high,2,Premium Recovery Solutions,breached,Refrigerated Transport,South
+FX-2024-077,ACC-79021,Freight Forwarding,billing@freightfwd.com,555-0177,27100,USD,17,assigned,medium,2,Premium Recovery Solutions,on_track,Freight,North
+FX-2024-078,ACC-79022,Import Export Co,ar@importexport.com,555-0178,56000,USD,84,in_progress,critical,2,Premium Recovery Solutions,warning,International Trade,East
+FX-2024-079,ACC-79023,Customs Brokerage,payments@customsbrok.com,555-0179,21300,USD,126,assigned,medium,2,Premium Recovery Solutions,breached,Trade Services,West
+FX-2024-080,ACC-79024,Port Operations,finance@portops.com,555-0180,69000,USD,33,assigned,high,2,Premium Recovery Solutions,on_track,Maritime,South
+FX-2024-081,ACC-79025,Cargo Handling,billing@cargohand.com,555-0181,32800,USD,59,follow_up,high,2,Premium Recovery Solutions,warning,Logistics,North
+FX-2024-082,ACC-79026,Supply Chain Tech,ap@supplychain.com,555-0182,43500,USD,103,assigned,high,2,Premium Recovery Solutions,breached,Technology,East
+FX-2024-083,ACC-79027,Inventory Management,payments@inventory.com,555-0183,18100,USD,16,assigned,low,2,Premium Recovery Solutions,on_track,Software,West
+FX-2024-084,ACC-79028,Procurement Services,finance@procurement.com,555-0184,25600,USD,73,in_progress,medium,2,Premium Recovery Solutions,warning,Business Services,South
+FX-2024-085,ACC-79029,Contract Manufacturing,billing@contractmfg.com,555-0185,51000,USD,114,assigned,critical,2,Premium Recovery Solutions,breached,Manufacturing,North
+FX-2024-086,ACC-79030,Quality Assurance,ar@qualityassur.com,555-0186,16800,USD,21,assigned,medium,2,Premium Recovery Solutions,on_track,Testing Services,East
+FX-2024-087,ACC-79031,Compliance Solutions,payments@compliance.com,555-0187,29900,USD,61,assigned,high,2,Premium Recovery Solutions,warning,Regulatory,West
+FX-2024-088,ACC-79032,Risk Management,finance@riskmgmt.com,555-0188,38700,USD,94,follow_up,high,2,Premium Recovery Solutions,breached,Financial Services,South
+FX-2024-089,ACC-79033,Audit Services,billing@auditserv.com,555-0189,22500,USD,12,assigned,medium,2,Premium Recovery Solutions,on_track,Professional Services,North
+FX-2024-090,ACC-79034,Tax Advisory,ap@taxadvisory.com,555-0190,14200,USD,46,assigned,medium,2,Premium Recovery Solutions,warning,Tax Services,East
+FX-2024-091,ACC-79035,Bookkeeping Co,payments@bookkeeping.com,555-0191,9300,USD,87,in_progress,low,2,Premium Recovery Solutions,breached,Accounting,West
+FX-2024-092,ACC-79036,Payroll Services,finance@payroll.com,555-0192,17600,USD,25,assigned,medium,2,Premium Recovery Solutions,on_track,HR Services,South
+FX-2024-093,ACC-79037,HR Technology,billing@hrtech.com,555-0193,33400,USD,70,assigned,high,2,Premium Recovery Solutions,warning,Human Resources,North
+FX-2024-094,ACC-79038,Talent Acquisition,ar@talentacq.com,555-0194,20900,USD,106,follow_up,medium,2,Premium Recovery Solutions,breached,Recruitment,East
+FX-2024-095,ACC-79039,Training Solutions,payments@training.com,555-0195,12600,USD,18,assigned,low,2,Premium Recovery Solutions,on_track,Education,West
+FX-2024-096,ACC-79040,Learning Platform,finance@learning.com,555-0196,28800,USD,52,in_progress,medium,2,Premium Recovery Solutions,warning,EdTech,South
+FX-2024-097,ACC-79041,Corporate Events,billing@corpevents.com,555-0197,15700,USD,100,assigned,medium,2,Premium Recovery Solutions,breached,Event Management,North
+FX-2024-098,ACC-79042,Conference Services,ap@conference.com,555-0198,19500,USD,14,assigned,medium,2,Premium Recovery Solutions,on_track,Event Services,East
+FX-2024-099,ACC-79043,Catering Business,payments@catering.com,555-0199,11800,USD,63,assigned,low,2,Premium Recovery Solutions,warning,Food Services,West
+FX-2024-100,ACC-79044,Venue Management,finance@venuemgmt.com,555-0200,34200,USD,92,follow_up,high,2,Premium Recovery Solutions,breached,Hospitality,South
+FX-2024-101,ACC-79045,Travel Agency,billing@travelagency.com,555-0201,13100,USD,27,assigned,medium,2,Premium Recovery Solutions,on_track,Travel,North
+FX-2024-102,ACC-79046,Adventure Tourism,ar@adventure.com,555-0202,24300,USD,78,in_progress,medium,2,Premium Recovery Solutions,warning,Tourism,East
+FX-2024-103,ACC-79047,Hotel Chain,payments@hotelchain.com,555-0203,67500,USD,121,assigned,critical,2,Premium Recovery Solutions,breached,Hospitality,West
+FX-2024-104,ACC-79048,Resort Management,finance@resortmgmt.com,555-0204,45800,USD,30,assigned,high,2,Premium Recovery Solutions,on_track,Hospitality,South
+FX-2024-105,ACC-79049,Restaurant Group,billing@restaurant.com,555-0205,18400,USD,55,follow_up,medium,2,Premium Recovery Solutions,warning,Food & Beverage,North
+FX-2024-106,ACC-79050,Food Delivery,ap@fooddelivery.com,555-0206,8700,USD,109,assigned,low,2,Premium Recovery Solutions,breached,Delivery Services,East
+FX-2024-107,ACC-79051,Grocery Chain,payments@grocery.com,555-0207,52300,USD,20,assigned,high,2,Premium Recovery Solutions,on_track,Retail,West
+FX-2024-108,ACC-79052,Pharmacy Network,finance@pharmacy.com,555-0208,26900,USD,75,in_progress,medium,2,Premium Recovery Solutions,warning,Healthcare,South
+FX-2024-109,ACC-79053,Medical Devices,billing@meddevices.com,555-0209,39100,USD,117,assigned,high,2,Premium Recovery Solutions,breached,Medical Equipment,North
+FX-2024-110,ACC-79054,Diagnostic Center,ar@diagnostic.com,555-0210,21700,USD,11,assigned,medium,2,Premium Recovery Solutions,on_track,Healthcare Services,East

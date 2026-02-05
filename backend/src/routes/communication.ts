@@ -26,7 +26,7 @@ router.post('/:id/communicate', async (req: AuthRequest, res: Response, next) =>
         }
 
         // Check access (DCA can only communicate on assigned cases)
-        if (req.user!.role === 'dca' && caseRecord.assignedDcaId !== req.user!.id) {
+        if (req.user!.role === 'dca_collector' && caseRecord.assignedDcaId !== req.user!.id) {
             throw new AppError('Access denied', 403);
         }
 
@@ -47,7 +47,7 @@ router.post('/:id/communicate', async (req: AuthRequest, res: Response, next) =>
             communication = await CommunicationService.sendEmail({
                 caseId,
                 template,
-                recipient: recipient || caseRecord.customerEmail || '',
+                recipient: recipient || caseRecord.customerDetails.email || '',
                 subject: '', // Will be generated from template
                 variables,
                 sentBy: req.user!.id,
@@ -57,7 +57,7 @@ router.post('/:id/communicate', async (req: AuthRequest, res: Response, next) =>
             communication = await CommunicationService.sendSMS({
                 caseId,
                 template,
-                recipient: recipient || caseRecord.customerPhone || '',
+                recipient: recipient || caseRecord.customerDetails.phone || '',
                 variables,
                 sentBy: req.user!.id,
                 sentByName: req.user!.name,
@@ -107,7 +107,7 @@ router.get('/:id/communications', async (req: AuthRequest, res: Response, next) 
         }
 
         // Check access
-        if (req.user!.role === 'dca' && caseRecord.assignedDcaId !== req.user!.id) {
+        if (req.user!.role === 'dca_collector' && caseRecord.assignedDcaId !== req.user!.id) {
             throw new AppError('Access denied', 403);
         }
 
@@ -125,7 +125,7 @@ router.get('/:id/communications', async (req: AuthRequest, res: Response, next) 
  * GET /api/communication/templates
  * Get available email and SMS templates
  */
-router.get('/templates', async (req: AuthRequest, res: Response, next) => {
+router.get('/templates', async (_req: AuthRequest, res: Response, next) => {
     try {
         const templates = CommunicationService.getAvailableTemplates();
         res.json({ templates });

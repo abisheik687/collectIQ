@@ -72,7 +72,7 @@ export class AutoAssignmentService {
                 },
                 order: [
                     ['priority', 'DESC'], // high > medium > low
-                    ['riskScore', 'DESC'], // highest risk first
+                    ['mlRiskScore', 'DESC'], // highest risk first
                 ],
                 transaction,
             });

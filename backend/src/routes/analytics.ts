@@ -93,8 +93,8 @@ router.get('/dca-performance', async (_req: AuthRequest, res: Response, next) =>
         assignedDcaName as dca_name,
         COUNT(*) as total_cases,
         COUNT(CASE WHEN status IN ('resolved', 'closed') THEN 1 END) as resolved_cases,
-        AVG(paymentProbability) as avg_payment_probability,
-        AVG(riskScore) as avg_risk_score
+        AVG(mlPaymentProbability) as avg_payment_probability,
+        AVG(mlRiskScore) as avg_risk_score
       FROM cases
       WHERE assignedDcaId IS NOT NULL
       GROUP BY assignedDcaName

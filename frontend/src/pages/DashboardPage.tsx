@@ -176,38 +176,40 @@ export default function DashboardPage() {
                 }
             />
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-4 gap-4 mb-8">
+            {/* Stats Grid - Bootstrap Responsive */}
+            <div className="row g-4 mb-8">
                 {stats.map((stat) => (
-                    <div key={stat.label} className="card card-padding">
-                        <div className="flex justify-between items-start mb-3">
-                            <div style={{
-                                width: '44px',
-                                height: '44px',
-                                borderRadius: '8px',
-                                backgroundColor: `${stat.color}20`,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: stat.color,
-                                border: `2px solid ${stat.color}40`
-                            }}>
-                                <stat.icon size={22} strokeWidth={2.5} />
-                            </div>
-                            {stat.trend && (
-                                <div className={`badge ${stat.trendUp ? 'badge-success' : 'badge-danger'}`}>
-                                    {stat.trendUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                                    {stat.trend}
+                    <div key={stat.label} className="col-12 col-md-6 col-lg-3">
+                        <div className="card card-padding">
+                            <div className="flex justify-between items-start mb-3">
+                                <div style={{
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '8px',
+                                    backgroundColor: `${stat.color}20`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: stat.color,
+                                    border: `2px solid ${stat.color}40`
+                                }}>
+                                    <stat.icon size={22} strokeWidth={2.5} />
                                 </div>
-                            )}
-                        </div>
-                        <div>
-                            <p className="text-xs uppercase" style={{ color: 'var(--text-secondary)', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
-                                {stat.label}
-                            </p>
-                            <h3 className="font-mono" style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1, color: stat.color }}>
-                                {stat.value}
-                            </h3>
+                                {stat.trend && (
+                                    <div className={`badge ${stat.trendUp ? 'badge-success' : 'badge-danger'}`}>
+                                        {stat.trendUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                                        {stat.trend}
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <p className="text-xs uppercase" style={{ color: 'var(--text-secondary)', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+                                    {stat.label}
+                                </p>
+                                <h3 className="font-mono" style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1, color: stat.color }}>
+                                    {stat.value}
+                                </h3>
+                            </div>
                         </div>
                     </div>
                 ))}

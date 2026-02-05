@@ -12,6 +12,12 @@ import emailRoutes from './routes/email';
 import adminRoutes from './routes/admin';
 import complianceRoutes from './routes/compliance';
 import workflowRoutes from './routes/workflow';
+import vendorRoutes from './routes/vendors';
+import paymentRoutes from './routes/payments';
+import commissionRoutes from './routes/commission';
+import ticketRoutes from './routes/tickets';
+import reconciliationRoutes from './routes/reconciliation';
+import promiseToPayRoutes from './routes/promiseToPay';
 import { errorHandler } from './middleware/errorHandler';
 import { initializeDatabase } from './scripts/init-db';
 
@@ -38,6 +44,25 @@ app.use((req, res, next) => {
     next();
 });
 
+// Root route - API information
+app.get('/', (req: Request, res: Response) => {
+    res.json({
+        name: 'CollectIQ API',
+        version: '1.0.0',
+        status: 'running',
+        description: 'AI-Powered DCA Management Platform',
+        endpoints: {
+            health: '/api/health',
+            auth: '/api/auth/login',
+            cases: '/api/cases',
+            analytics: '/api/analytics',
+            compliance: '/api/compliance',
+            admin: '/api/admin'
+        },
+        documentation: 'See README.md for complete API documentation'
+    });
+});
+
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {
     res.json({
@@ -56,7 +81,15 @@ app.use('/api/communication', communicationRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/compliance', complianceRoutes);
-app.use('/api/workflow', workflowRoutes); // Workflow guardrails enforcement
+app.use('/api/workflow', workflowRoutes);
+
+// Enterprise Routes (v1)
+app.use('/api/v1/vendors', vendorRoutes);
+app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/commission', commissionRoutes);
+app.use('/api/v1/tickets', ticketRoutes);
+app.use('/api/v1/reconciliation', reconciliationRoutes);
+app.use('/api/v1/promise-to-pay', promiseToPayRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
@@ -94,6 +127,15 @@ const startServer = async () => {
             logger.info('Sample data initialized');
         } catch (err) {
             logger.error('Failed to seed database:', err);
+        }
+
+        // Initialize scheduled jobs
+        try {
+            const { initializeJobs } = require('./jobs');
+            initializeJobs();
+            logger.info('Scheduled jobs initialized successfully');
+        } catch (err) {
+            logger.error('Failed to initialize scheduled jobs:', err);
         }
 
         // Start server

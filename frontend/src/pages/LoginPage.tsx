@@ -22,7 +22,7 @@ export default function LoginPage() {
             login(user, token);
             toast.success('Login successful!');
 
-            if (user.role === 'enterprise') {
+            if (user.role === 'fedex_admin' || user.role === 'fedex_user') {
                 navigate('/dashboard');
             } else {
                 navigate('/dca-portal');
@@ -34,8 +34,8 @@ export default function LoginPage() {
         }
     };
 
-    const demoLogin = (role: 'enterprise' | 'dca') => {
-        if (role === 'enterprise') {
+    const demoLogin = (role: 'admin' | 'dca') => {
+        if (role === 'admin') {
             setEmail('admin@enterprise.com');
             setPassword('admin123');
         } else {
@@ -123,11 +123,11 @@ export default function LoginPage() {
                     <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem', fontWeight: 600 }}>Demo Accounts:</p>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                         <button
-                            onClick={() => demoLogin('enterprise')}
+                            onClick={() => demoLogin('admin')}
                             className="btn btn-secondary btn-sm"
                             type="button"
                         >
-                            Enterprise
+                            Admin
                         </button>
                         <button
                             onClick={() => demoLogin('dca')}

@@ -9,6 +9,9 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import AuditPage from './pages/AuditPage';
 import ComplianceDecisionPage from './pages/ComplianceDecisionPage';
 import AdminGovernancePage from './pages/AdminGovernancePage';
+import EnterpriseTest from './pages/EnterpriseTest';
+import VendorsPage from './pages/VendorsPage';
+import PaymentsPage from './pages/PaymentsPage';
 import Layout from './components/Layout';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -33,7 +36,7 @@ function App() {
                     }
                 >
                     <Route index element={
-                        user?.role === 'enterprise' ? (
+                        (user?.role === 'fedex_admin' || user?.role === 'fedex_user') ? (
                             <Navigate to="/dashboard" replace />
                         ) : (
                             <Navigate to="/dca-portal" replace />
@@ -46,6 +49,9 @@ function App() {
                     <Route path="audit" element={<AuditPage />} />
                     <Route path="compliance" element={<ComplianceDecisionPage />} />
                     <Route path="governance" element={<AdminGovernancePage />} />
+                    <Route path="enterprise-test" element={<EnterpriseTest />} />
+                    <Route path="vendors" element={<VendorsPage />} />
+                    <Route path="payments" element={<PaymentsPage />} />
                 </Route>
             </Routes>
 

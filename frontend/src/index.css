@@ -71,8 +71,10 @@
   /* Text Colors - Maximum Contrast */
   --text-primary: #000000;
   /* True black for readability */
-  --text-secondary: #525252;
-  --text-tertiary: #a3a3a3;
+  --text-secondary: #404040;
+  /* Darker for better readability (was #525252) */
+  --text-tertiary: #737373;
+  /* Improved contrast (was #a3a3a3) */
   --text-white: #FFFFFF;
 
   /* Borders */
@@ -389,7 +391,8 @@ h4 {
   padding: 0.875rem 1rem;
   margin: 0.125rem 0.75rem;
   border-radius: var(--radius-md);
-  color: var(--gray-400);
+  color: #d4d4d4;
+  /* Brighter for dark background (was gray-400) */
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
@@ -467,6 +470,8 @@ h4 {
 .table td {
   padding: 0.875rem 1rem;
   border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  /* Ensure maximum contrast */
 }
 
 .table tbody tr:hover {
@@ -738,4 +743,125 @@ h4 {
   flex-direction: column;
   box-shadow: var(--shadow-xl);
   border: 2px solid var(--border-default);
+}
+
+/* ========================================
+   RESPONSIVE UTILITIES & BREAKPOINTS
+   ======================================== */
+
+/* Mobile First Responsive Breakpoints */
+@media (max-width: 767px) {
+  /* Mobile: <768px */
+
+  .page-container {
+    padding: var(--space-4);
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  /* Stack grid columns on mobile */
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Make sidebar overlay on mobile */
+  .sidebar {
+    position: fixed;
+    left: -280px;
+    transition: left 0.3s ease;
+    z-index: 100;
+  }
+
+  .sidebar.mobile-open {
+    left: 0;
+  }
+
+  /* Horizontal scroll for tables */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    min-width: 800px;
+  }
+
+  /* Stack buttons vertically */
+  .flex.gap-3 {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  /* Tablet: 768px-991px */
+
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .page-container {
+    padding: var(--space-5);
+  }
+}
+
+@media (min-width: 992px) {
+  /* Desktop: ≥992px */
+
+  .page-container {
+    padding: var(--space-6);
+  }
+}
+
+/* Touch-friendly sizes for mobile */
+@media (max-width: 767px) {
+  .btn {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  .sidebar-link {
+    min-height: 48px;
+  }
+}
+
+/* Utility Classes for Responsive Display */
+.d-mobile-none {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .d-mobile-none {
+    display: initial;
+  }
+
+  .d-desktop-none {
+    display: none;
+  }
+}
+
+/* Responsive Text Sizes */
+@media (max-width: 767px) {
+
+  h1,
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
 }

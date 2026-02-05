@@ -7,8 +7,9 @@ export interface AuthRequest extends Request {
         id: number;
         email: string;
         name: string;
-        role: 'enterprise' | 'dca';
-        agency?: string;
+        role: 'fedex_admin' | 'fedex_user' | 'dca_admin' | 'dca_collector' | 'audit';
+        dcaVendorId?: number;
+        permissions?: string[];
     };
 }
 
@@ -37,8 +38,9 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
             id: number;
             email: string;
             name: string;
-            role: 'enterprise' | 'dca';
-            agency?: string;
+            role: 'fedex_admin' | 'fedex_user' | 'dca_admin' | 'dca_collector' | 'audit';
+            dcaVendorId?: number;
+            permissions?: string[];
         };
 
         req.user = decoded;
@@ -71,3 +73,7 @@ export const authorize = (...roles: string[]) => {
         next();
     };
 };
+
+// Alias for consistency
+export const authMiddleware = authenticate;
+export const checkPermission = authorize;

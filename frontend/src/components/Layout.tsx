@@ -11,7 +11,7 @@ export default function Layout() {
         navigate('/login');
     };
 
-    const navItems = user?.role === 'enterprise'
+    const navItems = (user?.role === 'fedex_admin' || user?.role === 'fedex_user')
         ? [
             { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { to: '/analytics', icon: BarChart3, label: 'Analytics' },
@@ -60,7 +60,7 @@ export default function Layout() {
                         </div>
                     </div>
                     <p style={{ fontSize: '0.75rem', color: 'var(--gray-400)', paddingLeft: '3rem' }}>
-                        {user?.role === 'enterprise' ? 'Enterprise Edition' : user?.agency}
+                        {(user?.role === 'fedex_admin' || user?.role === 'fedex_user') ? 'FedEx Edition' : user?.name}
                     </p>
                 </div>
 

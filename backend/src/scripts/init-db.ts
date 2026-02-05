@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/User';
 import Case from '../models/Case';
-import Workflow from '../models/Workflow';
 import MLService from '../services/MLService';
 import WorkflowEngine from '../services/WorkflowEngine';
 import { logger } from '../utils/logger';
@@ -26,47 +25,48 @@ export async function initializeDatabase(): Promise<void> {
                 email: 'admin@enterprise.com',
                 password: adminPassword,
                 name: 'Enterprise Admin',
-                role: 'enterprise',
+                role: 'fedex_admin',
+                permissions: ['cases:read', 'cases:write', 'cases:assign', 'analytics:read'],
                 isActive: true,
             },
             {
                 email: 'dca@agency.com',
                 password: dcaPassword,
-                name: 'DCA Collector 1',
-                role: 'dca',
-                agency: 'Premium Recovery Solutions',
+                name: 'Premium Recovery Solutions',
+                role: 'dca_collector',
+                permissions: ['cases:read', 'cases:update'],
                 isActive: true,
             },
             {
                 email: 'dca2@agency.com',
                 password: dcaPassword,
-                name: 'DCA Collector 2',
-                role: 'dca',
-                agency: 'Elite Collections Inc',
+                name: 'Elite Collections Inc',
+                role: 'dca_collector',
+                permissions: ['cases:read', 'cases:update'],
                 isActive: true,
             },
             {
                 email: 'dca3@agency.com',
                 password: dcaPassword,
-                name: 'DCA Collector 3',
-                role: 'dca',
-                agency: 'Swift Debt Recovery',
+                name: 'Swift Debt Recovery',
+                role: 'dca_collector',
+                permissions: ['cases:read', 'cases:update'],
                 isActive: true,
             },
             {
                 email: 'dca4@agency.com',
                 password: dcaPassword,
-                name: 'DCA Collector 4',
-                role: 'dca',
-                agency: 'Global Recovery Partners',
+                name: 'Global Recovery Partners',
+                role: 'dca_collector',
+                permissions: ['cases:read', 'cases:update'],
                 isActive: true,
             },
             {
                 email: 'dca5@agency.com',
                 password: dcaPassword,
-                name: 'DCA Collector 5',
-                role: 'dca',
-                agency: 'Apex Collections Group',
+                name: 'Apex Collections Group',
+                role: 'dca_collector',
+                permissions: ['cases:read', 'cases:update'],
                 isActive: true,
             },
         ]);
@@ -109,7 +109,7 @@ export async function initializeDatabase(): Promise<void> {
                 const dca1 = await User.findOne({ where: { email: 'dca@agency.com' } });
                 if (dca1) {
                     assignedDcaId = dca1.id;
-                    assignedDcaName = dca1.agency; // Use agency name as dcaName
+                    assignedDcaName = dca1.name; // Use name as dcaName
                     status = 'assigned';
                 }
             }
@@ -118,10 +118,14 @@ export async function initializeDatabase(): Promise<void> {
                 const dca2 = await User.findOne({ where: { email: 'dca2@agency.com' } });
                 if (dca2) {
                     assignedDcaId = dca2.id;
-                    assignedDcaName = dca2.agency;
+                    assignedDcaName = dca2.name;
                     status = 'assigned';
                 }
             }
+
+            // Calculate invoice date based on overdue days (date in the past)
+            const invoiceDate = new Date();
+            invoiceDate.setDate(invoiceDate.getDate() - caseData.overdueDays);
 
             // Create case
             const newCase = await Case.create({
@@ -129,11 +133,14 @@ export async function initializeDatabase(): Promise<void> {
                 accountNumber: caseData.accountNumber,
                 customerName: caseData.customerName,
                 amount: caseData.amount,
+                currency: 'USD',
                 overdueDays: caseData.overdueDays,
+                invoiceDate,
                 status: status,
                 priority: prediction.priority,
-                riskScore: prediction.riskScore,
-                paymentProbability: prediction.paymentProbability,
+                mlRiskScore: prediction.priority,
+                mlPaymentProbability: prediction.paymentProbability,
+                customerDetails: {},
                 contactCount: 0,
                 createdBy: admin.id,
                 assignedDcaId,

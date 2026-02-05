@@ -2,7 +2,6 @@ import { Router, Response } from 'express';
 import { Op } from 'sequelize';
 import { sequelize } from '../config/database';
 import Case from '../models/Case';
-import Workflow from '../models/Workflow';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import AuditService from '../services/AuditService';
@@ -33,7 +32,7 @@ router.get('/', async (req: AuthRequest, res: Response, next) => {
         const where: any = {};
 
         // DCA users can only see their assigned cases
-        if (req.user!.role === 'dca') {
+        if (req.user!.role === 'dca_collector') {
             where.assignedDcaId = req.user!.id;
         }
 
@@ -85,7 +84,7 @@ router.get('/:id', async (req: AuthRequest, res: Response, next) => {
         }
 
         // DCA users can only view their assigned cases
-        if (req.user!.role === 'dca' && caseRecord.assignedDcaId !== req.user!.id) {
+        if (req.user!.role === 'dca_collector' && caseRecord.assignedDcaId !== req.user!.id) {
             throw new AppError('Access denied', 403);
         }
 
@@ -125,10 +124,13 @@ router.post('/', authorize('enterprise'), async (req: AuthRequest, res: Response
             customerName,
             amount,
             overdueDays,
+            invoiceDate: new Date(Date.now() - overdueDays * 24 * 60 * 60 * 1000),
+            currency: 'USD',
+            customerDetails: {},
             status: 'new',
             priority: prediction.priority,
-            riskScore: prediction.riskScore,
-            paymentProbability: prediction.paymentProbability,
+            mlRiskScore: prediction.riskScore,
+            mlPaymentProbability: prediction.paymentProbability,
             contactCount: 0,
             createdBy: req.user!.id,
         });
@@ -216,13 +218,15 @@ router.post('/bulk-upload', authorize('enterprise'), upload.single('file'), asyn
                         caseNumber,
                         accountNumber: row.accountNumber || `ACC-${Date.now()}`,
                         customerName: row.customerName,
-                        customerEmail: row.customerEmail,
+                        customerDetails: { email: row.customerEmail },
                         amount,
                         overdueDays,
+                        invoiceDate: dueDate,
+                        currency: 'USD',
                         status: 'new',
                         priority: row.priority || prediction.priority,
-                        riskScore: prediction.riskScore,
-                        paymentProbability: prediction.paymentProbability,
+                        mlRiskScore: prediction.riskScore,
+                        mlPaymentProbability: prediction.paymentProbability,
                         contactCount: 0,
                         createdBy: req.user!.id,
                     }, { transaction });
@@ -242,10 +246,8 @@ router.post('/bulk-upload', authorize('enterprise'), upload.single('file'), asyn
             // Commit transaction if all successful
             await transaction.commit();
         } catch (error: any) {
-            // Ensure rollback if not already done
-            if (!transaction.finished) {
-                await transaction.rollback();
-            }
+            // Rollback on error
+            await transaction.rollback();
             throw error;
         }
 
@@ -281,7 +283,7 @@ router.put('/:id', async (req: AuthRequest, res: Response, next) => {
         }
 
         // DCA users can only update their assigned cases
-        if (req.user!.role === 'dca' && caseRecord.assignedDcaId !== req.user!.id) {
+        if (req.user!.role === 'dca_collector' && caseRecord.assignedDcaId !== req.user!.id) {
             throw new AppError('Access denied', 403);
         }
 
@@ -371,7 +373,7 @@ router.post('/:id/notes', async (req: AuthRequest, res: Response, next) => {
             throw new AppError('Case not found', 404);
         }
 
-        if (req.user!.role === 'dca' && caseRecord.assignedDcaId !== req.user!.id) {
+        if (req.user!.role === 'dca_collector' && caseRecord.assignedDcaId !== req.user!.id) {
             throw new AppError('Access denied', 403);
         }
 

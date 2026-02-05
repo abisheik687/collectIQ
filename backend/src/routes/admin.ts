@@ -36,7 +36,7 @@ router.use(authenticate);
 router.post('/reports/export', async (req: AuthRequest, res: Response, next) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
@@ -90,7 +90,7 @@ router.post('/reports/export', async (req: AuthRequest, res: Response, next) => 
 router.get('/reports/download/:filename', async (req: AuthRequest, res: Response, next) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
@@ -145,7 +145,7 @@ router.get('/reports/download/:filename', async (req: AuthRequest, res: Response
 router.get('/performance/bpi', async (req: AuthRequest, res: Response, next) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
@@ -181,7 +181,7 @@ router.get('/performance/dca/:id', async (req: AuthRequest, res: Response, next)
         const endDate = req.query.endDate ? new Date(req.query.endDate as string) : new Date();
 
         // DCAs can view their own performance, admins can view any
-        if (req.user!.role !== 'enterprise' && req.user!.id !== dcaId) {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user' && req.user!.id !== dcaId) {
             return res.status(403).json({
                 success: false,
                 error: 'Access denied'
@@ -209,7 +209,7 @@ router.get('/performance/dca/:id', async (req: AuthRequest, res: Response, next)
 router.get('/workload/summary', async (req: AuthRequest, res: Response, next) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
@@ -236,7 +236,7 @@ router.get('/workload/summary', async (req: AuthRequest, res: Response, next) =>
 router.get('/workload/dcas', async (req: AuthRequest, res: Response, next) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
@@ -263,7 +263,7 @@ router.get('/workload/dcas', async (req: AuthRequest, res: Response, next) => {
 router.get('/workload/sla-risk', async (req: AuthRequest, res: Response, next) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
@@ -290,7 +290,7 @@ router.get('/workload/sla-risk', async (req: AuthRequest, res: Response, next) =
 router.get('/workload/recommendations', async (req: AuthRequest, res: Response, next) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
@@ -318,7 +318,7 @@ router.get('/workload/recommendations', async (req: AuthRequest, res: Response, 
 router.post('/auto-assign', async (req: AuthRequest, res: Response, next) => {
     try {
         // Check admin role
-        if (req.user!.role !== 'enterprise') {
+        if (req.user!.role !== 'fedex_admin' && req.user!.role !== 'fedex_user') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin role required'
