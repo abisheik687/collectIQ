@@ -336,6 +336,35 @@ h4 {
   border-color: var(--gray-300);
 }
 
+/* Priority Badges - Professional Grade */
+.badge-critical {
+  background-color: #7f1d1d;
+  /* Deep red 900 */
+  color: white;
+  border-color: #7f1d1d;
+}
+
+.badge-high {
+  background-color: #dc2626;
+  /* Red 600 */
+  color: white;
+  border-color: #dc2626;
+}
+
+.badge-medium {
+  background-color: #d97706;
+  /* Amber 600 */
+  color: white;
+  border-color: #d97706;
+}
+
+.badge-low {
+  background-color: #65a30d;
+  /* Lime 600 */
+  color: white;
+  border-color: #65a30d;
+}
+
 /* Component: Form Inputs */
 .form-input,
 .form-select {
@@ -419,6 +448,12 @@ h4 {
   padding: var(--space-6);
 }
 
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .page-header {
   margin-bottom: var(--space-6);
   padding-bottom: var(--space-4);
@@ -477,6 +512,16 @@ h4 {
 .table tbody tr:hover {
   background-color: var(--gray-25);
 }
+
+.hover-highlight:hover {
+  background-color: var(--gray-50) !important;
+  transition: background-color 0.2s ease;
+}
+
+.text-right {
+  text-align: right;
+}
+
 
 /* Spacing Utilities */
 .mb-2 {

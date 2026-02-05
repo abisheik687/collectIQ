@@ -224,10 +224,10 @@ export default function DCAPortalPage() {
                                         {/* Status Badge */}
                                         <div className="flex items-center gap-2">
                                             <span className={`badge ${['resolved', 'closed'].includes(caseItem.status)
-                                                    ? 'badge-success'
-                                                    : caseItem.status === 'in_progress'
-                                                        ? 'badge-info'
-                                                        : 'badge-neutral'
+                                                ? 'badge-success'
+                                                : caseItem.status === 'in_progress'
+                                                    ? 'badge-info'
+                                                    : 'badge-neutral'
                                                 }`}>
                                                 {caseItem.status.replace('_', ' ')}
                                             </span>
@@ -335,8 +335,17 @@ export default function DCAPortalPage() {
                                                     <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
                                                         Risk Level
                                                     </p>
-                                                    <span className={`badge badge-${selectedCase.mlRiskScore || selectedCase.priority}`} style={{ fontSize: '0.875rem' }}>
-                                                        {selectedCase.mlRiskScore || selectedCase.priority}
+                                                    <span className={`badge ${selectedCase.mlRiskScore < 30
+                                                            ? 'badge-success'
+                                                            : selectedCase.mlRiskScore < 60
+                                                                ? 'badge-warning'
+                                                                : 'badge-danger'
+                                                        }`} style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem', fontWeight: 700 }}>
+                                                        {selectedCase.mlRiskScore < 30
+                                                            ? 'LOW RISK'
+                                                            : selectedCase.mlRiskScore < 60
+                                                                ? 'MEDIUM RISK'
+                                                                : 'HIGH RISK'}
                                                     </span>
                                                 </div>
                                             </div>

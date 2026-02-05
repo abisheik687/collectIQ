@@ -44,43 +44,151 @@ router.post('/decide', authenticate, async (req: AuthRequest, res: Response) => 
         } catch (mlError: any) {
             console.warn('ML API unavailable, using fallback compliance decision:', mlError.message);
 
-            // Fallback: Basic rule-based compliance decision
+            // Intelligent Fallback: Rule-based compliance scoring
+            const calculateFallbackScore = () => {
+                let score = 0;
+                let riskFactors: any = {};
+                let violatedRules: string[] = [];
+                let ethicalFlags: string[] = [];
+
+                // Check proposed action for problematic keywords
+                const actionLower = proposed_action.toLowerCase();
+
+                // Time-sensitive violations
+                const now = new Date();
+                const hour = now.getHours();
+                if (actionLower.includes('call') && (hour < 8 || hour > 21)) {
+                    score += 30;
+                    riskFactors.time_violation = 'high';
+                    violatedRules.push('FDCPA §805(a)(1): Contact outside 8am-9pm local time');
+                    ethicalFlags.push('Attempting contact during restricted hours');
+                }
+
+                // Harassment indicators
+                if (actionLower.match(/threaten|intimidate|harass|abuse/)) {
+                    score += 40;
+                    riskFactors.harassment = 'critical';
+                    violatedRules.push('FDCPA §806: Harassment or abuse prohibited');
+                    ethicalFlags.push('Language suggests potential harassment');
+                }
+
+                // Legal action threats without basis
+                if (actionLower.match(/sue|lawsuit|legal action|attorney/) && !case_data?.legalBasis) {
+                    score += 25;
+                    riskFactors.false_legal_threat = 'high';
+                    violatedRules.push('FDCPA §807(5): False threat of legal action');
+                    ethicalFlags.push('Legal threat without documented basis');
+                }
+
+                // Frequency concerns
+                if (actionLower.includes('call') && case_data?.contactsThisWeek >= 3) {
+                    score += 20;
+                    riskFactors.excessive_contact = 'medium';
+                    ethicalFlags.push('High contact frequency this week');
+                }
+
+                // Vulnerable consumer protections
+                if (case_data?.vulnerableConsumer || case_data?.elderlyFlag) {
+                    if (actionLower.match(/urgency|immediately|today|now/)) {
+                        score += 15;
+                        riskFactors.vulnerability_exploitation = 'medium';
+                        ethicalFlags.push('Pressure tactics on vulnerable consumer');
+                    }
+                }
+
+                // Third-party disclosure risk
+                if (actionLower.match(/employer|family|neighbor|workplace/)) {
+                    score += 35;
+                    riskFactors.third_party_disclosure = 'critical';
+                    violatedRules.push('FDCPA §805(b): Third-party disclosure prohibited');
+                    ethicalFlags.push('Risk of unauthorized debt disclosure');
+                }
+
+                // Determine risk level
+                let riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+                if (score >= 60) riskLevel = 'CRITICAL';
+                else if (score >= 35) riskLevel = 'HIGH';
+                else if (score >= 15) riskLevel = 'MEDIUM';
+                else riskLevel = 'LOW';
+
+                // Determine decision
+                const isCompliant = score < 35;
+                const decisionType = score >= 60 ? 'BLOCKED' : (score >= 35 ? 'REVIEW_REQUIRED' : 'ALLOWED');
+
+                return {
+                    score,
+                    riskLevel,
+                    riskFactors,
+                    violatedRules,
+                    ethicalFlags,
+                    isCompliant,
+                    decisionType
+                };
+            };
+
+            const analysis = calculateFallbackScore();
+
+            // Fallback: Rule-based compliance decision
             decision = {
-                decision: 'ALLOWED',
+                decision: analysis.decisionType,
                 compliance_validation: {
-                    is_compliant: true,
-                    violated_rules: [],
+                    is_compliant: analysis.isCompliant,
+                    violated_rules: analysis.violatedRules,
                     checks_performed: {
-                        fdcpa_time_check: 'pass',
+                        fdcpa_time_check: analysis.riskFactors.time_violation ? 'fail' : 'pass',
                         tcpa_consent_check: 'pass',
-                        frequency_check: 'pass',
-                        vulnerability_check: 'pass'
+                        frequency_check: analysis.riskFactors.excessive_contact ? 'warning' : 'pass',
+                        vulnerability_check: analysis.riskFactors.vulnerability_exploitation ? 'warning' : 'pass',
+                        harassment_check: analysis.riskFactors.harassment ? 'fail' : 'pass',
+                        third_party_check: analysis.riskFactors.third_party_disclosure ? 'fail' : 'pass'
                     },
-                    regulatory_notes: 'ML API unavailable - using basic rule validation'
+                    regulatory_notes: analysis.violatedRules.length > 0
+                        ? `Rule violations detected: ${analysis.violatedRules.join('; ')}`
+                        : 'ML API unavailable - using intelligent rule validation'
                 },
                 ethical_risk_assessment: {
-                    total_score: 15,
-                    risk_level: 'LOW',
-                    risk_factors: {},
-                    ethical_flags: []
+                    total_score: analysis.score,
+                    risk_level: analysis.riskLevel,
+                    risk_factors: analysis.riskFactors,
+                    ethical_flags: analysis.ethicalFlags
                 },
                 explanation: {
-                    decision_summary: 'ML API is currently unavailable. Basic compliance checks passed. All regulatory requirements have been validated using rule-based fallback system.',
-                    why_this_action: `The proposed action "${proposed_action}" is compliant with FDCPA and TCPA regulations. All basic compliance checks (timing, consent, frequency, vulnerability) have passed validation. This action can proceed as proposed.`,
-                    why_blocked: null,
-                    why_not_alternatives: 'The proposed action is compliant and appropriate. No alternative actions are necessary at this time.',
+                    decision_summary: analysis.decisionType === 'BLOCKED'
+                        ? 'Action BLOCKED due to significant compliance violations detected by rule-based analysis.'
+                        : analysis.decisionType === 'REVIEW_REQUIRED'
+                            ? 'Action flagged for MANUAL REVIEW due to potential compliance concerns.'
+                            : 'Action ALLOWED after analyzing against regulatory frameworks using fallback rules.',
+                    why_this_action: analysis.isCompliant
+                        ? `The proposed action \"${proposed_action}\" passes basic compliance checks. Analysis shows ${analysis.score} risk score (${analysis.riskLevel} risk level).`
+                        : null,
+                    why_blocked: !analysis.isCompliant
+                        ? `Compliance analysis detected ${analysis.violatedRules.length} regulatory violations and ${analysis.ethicalFlags.length} ethical concerns. Risk score: ${analysis.score}/100. This action could expose the organization to legal liability.`
+                        : null,
+                    why_not_alternatives: analysis.isCompliant
+                        ? 'The proposed action is compliant. No alternative actions are necessary.'
+                        : 'Consider revising the proposed action to address the identified violations before proceeding.',
                     principles_applied: [
-                        'FDCPA Time-of-Contact Rules',
+                        'FDCPA §805: Communication in connection with debt collection',
+                        'FDCPA §806: Harassment or abuse',
+                        'FDCPA §807: False or misleading representations',
                         'TCPA Consent Requirements',
-                        'Contact Frequency Limits',
-                        'Consumer Vulnerability Protection'
+                        'Consumer Vulnerability Protections'
                     ],
-                    legal_justification: 'All checks comply with Fair Debt Collection Practices Act (FDCPA) §805-809 and Telephone Consumer Protection Act (TCPA) requirements. Basic rule-based validation confirms compliance.',
-                    expected_outcome: 'Proceeding with this action is expected to maintain regulatory compliance while advancing the collection process appropriately.',
+                    legal_justification: analysis.isCompliant
+                        ? 'Rule-based analysis confirms compliance with Fair Debt Collection Practices Act (FDCPA) and TCPA requirements.'
+                        : `VIOLATIONS DETECTED: ${analysis.violatedRules.join(' | ')}`,
+                    expected_outcome: analysis.isCompliant
+                        ? 'Proceeding with this action maintains regulatory compliance.'
+                        : 'Proceeding with this action risks regulatory violations and potential penalties.',
                     confidence_level: 'medium',
-                    fallback_note: 'Note: This decision was generated using fallback rules. For complex cases, manual review is recommended.'
+                    fallback_note: 'Note: This decision was generated using intelligent rule-based fallback. ML API is unavailable. For complex cases, manual legal review is strongly recommended.'
                 },
-                alternative_actions: [],
+                alternative_actions: !analysis.isCompliant ? [
+                    'Revise communication to remove threatening language',
+                    'Schedule contact during FDCPA-compliant hours (8am-9pm)',
+                    'Reduce contact frequency to comply with best practices',
+                    'Consult legal team for guidance on high-risk actions'
+                ] : [],
                 fallback_mode: true
             };
         }

@@ -112,7 +112,23 @@ export default function AdminGovernancePage() {
 
             if (res.data.success) {
                 toast.success(`Report generated successfully!`);
-                window.open(res.data.downloadUrl, '_blank');
+
+                // Download the generated file with auth headers
+                const downloadRes = await api.get(res.data.downloadUrl, {
+                    responseType: 'blob'
+                });
+
+                // Create blob link
+                const url = window.URL.createObjectURL(new Blob([downloadRes.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                // Extract filename from the download URL or use a default
+                const filename = res.data.downloadUrl.split('/').pop() || `report.${exportFormat}`;
+                link.setAttribute('download', filename);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode?.removeChild(link);
+                window.URL.revokeObjectURL(url);
             }
         } catch (error) {
             console.error('Export failed:', error);
@@ -251,11 +267,14 @@ export default function AdminGovernancePage() {
                                     </div>
                                 </div>
                                 <p className="text-xs uppercase" style={{ color: 'var(--text-secondary)', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
-                                    Assigned Cases
+                                    Active Cases
                                 </p>
                                 <h3 className="font-mono" style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1, color: 'var(--success)' }}>
                                     {workloadSummary.totalAssignedCases}
                                 </h3>
+                                <p className="text-xs font-mono" style={{ color: 'var(--text-tertiary)', marginTop: '0.5rem' }}>
+                                    Assigned + In Progress + Follow-up
+                                </p>
                             </div>
                             <div className="card card-padding">
                                 <div className="flex justify-between items-start mb-3">

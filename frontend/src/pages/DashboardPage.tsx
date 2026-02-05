@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { TrendingUp, Clock, AlertTriangle, LayoutDashboard, UserPlus, ArrowUpRight, ArrowDownRight, CheckCircle2, Upload, Zap, MessageSquare } from 'lucide-react';
+import { TrendingUp, Clock, AlertTriangle, LayoutDashboard, UserPlus, ArrowUpRight, ArrowDownRight, CheckCircle2, Upload, Zap, MessageSquare, ArrowUpDown, ArrowUp, ArrowDown, Filter, Search, Download } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../services/api';
@@ -15,6 +15,43 @@ export default function DashboardPage() {
     const [commModalOpen, setCommModalOpen] = useState(false);
     const [selectedCase, setSelectedCase] = useState<any>(null);
     const [selectedDca, setSelectedDca] = useState('');
+
+    // Sorting and Filtering state
+    const [sortColumn, setSortColumn] = useState<'amount' | 'overdueDays' | 'priority' | 'status' | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Handle CSV Export
+    const handleExport = () => {
+        if (filteredCases.length === 0) {
+            toast.error('No cases to export');
+            return;
+        }
+
+        const headers = ['Case ID', 'Customer', 'Amount', 'Status', 'Risk Score', 'Assigned DCA', 'Priority'];
+        const csvContent = [
+            headers.join(','),
+            ...filteredCases.map((c: any) => [
+                c.id,
+                `"${c.customerName}"`,
+                c.amount,
+                c.status,
+                c.mlRiskScore,
+                `"${c.assignedDcaName || 'Unassigned'}"`,
+                calculatePriority(c)
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cases_export_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        toast.success('Cases exported successfully');
+    };
 
     const { data: cases } = useQuery({
         queryKey: ['cases'],
@@ -141,6 +178,123 @@ export default function DashboardPage() {
         },
     ];
 
+    // Calculate intelligent priority based on case metrics
+    const calculatePriority = (caseItem: any): 'critical' | 'high' | 'medium' | 'low' => {
+        const amount = parseFloat(caseItem.amount || 0);
+        const overdueDays = caseItem.overdueDays || 0;
+        const riskScore = caseItem.mlRiskScore || 50; // 0-100, higher = more risk
+
+        // Calculate priority score (0-100)
+        let priorityScore = 0;
+
+        // Amount contribution (0-45 points) - Higher weight for larger debts
+        if (amount >= 50000) priorityScore += 45;
+        else if (amount >= 20000) priorityScore += 35;
+        else if (amount >= 10000) priorityScore += 25;
+        else if (amount >= 5000) priorityScore += 15;
+        else if (amount >= 2000) priorityScore += 8;
+
+        // Overdue days contribution (0-35 points) - Higher weight for longer delays
+        if (overdueDays >= 180) priorityScore += 35;
+        else if (overdueDays >= 120) priorityScore += 30;
+        else if (overdueDays >= 90) priorityScore += 22;
+        else if (overdueDays >= 60) priorityScore += 15;
+        else if (overdueDays >= 30) priorityScore += 8;
+
+        // Risk score contribution (0-20 points)
+        // Higher ML risk = higher priority
+        if (riskScore >= 80) priorityScore += 20;
+        else if (riskScore >= 60) priorityScore += 15;
+        else if (riskScore >= 40) priorityScore += 10;
+        else if (riskScore >= 20) priorityScore += 5;
+
+        // Determine priority level - Adjusted thresholds for realistic results
+        if (priorityScore >= 70) return 'critical';
+        if (priorityScore >= 45) return 'high';      // $15K + 120 days = 55pts = HIGH ✓
+        if (priorityScore >= 20) return 'medium';
+        return 'low';
+    };
+
+    // Handle column sorting
+    const handleSort = (column: 'amount' | 'overdueDays' | 'priority' | 'status') => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortColumn(column);
+            setSortDirection('asc');
+        }
+    };
+
+    // Get filtered and sorted cases
+    const getFilteredAndSortedCases = () => {
+        if (!cases) return [];
+
+        let filtered = [...cases];
+
+        // Apply status filter
+        if (statusFilter !== 'all') {
+            filtered = filtered.filter(c => c.status === statusFilter);
+        }
+
+        // Apply search filter
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(c =>
+                c.customerName?.toLowerCase().includes(query) ||
+                c.customerEmail?.toLowerCase().includes(query) ||
+                c.id.toString().includes(query) ||
+                c.assignedDcaName?.toLowerCase().includes(query)
+            );
+        }
+
+        // Apply sorting
+        if (sortColumn) {
+            filtered.sort((a, b) => {
+                let aVal, bVal;
+
+                if (sortColumn === 'amount') {
+                    aVal = parseFloat(a.amount);
+                    bVal = parseFloat(b.amount);
+                } else if (sortColumn === 'overdueDays') {
+                    aVal = a.overdueDays;
+                    bVal = b.overdueDays;
+                } else if (sortColumn === 'priority') {
+                    const priorityOrder: any = { critical: 4, high: 3, medium: 2, low: 1 };
+                    aVal = priorityOrder[calculatePriority(a)] || 0;
+                    bVal = priorityOrder[calculatePriority(b)] || 0;
+                } else if (sortColumn === 'status') {
+                    const statusOrder: any = {
+                        new: 1, assigned: 2, in_progress: 3, contacted: 4,
+                        follow_up: 5, promise_to_pay: 6, refused: 7, resolved: 8, closed: 9
+                    };
+                    aVal = statusOrder[a.status] || 0;
+                    bVal = statusOrder[b.status] || 0;
+                }
+
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+        }
+
+        return filtered;
+    };
+
+    const filteredCases = getFilteredAndSortedCases();
+
+    // Status filter options with counts
+    const statusFilters = [
+        { value: 'all', label: 'All Cases', count: cases?.length || 0 },
+        { value: 'assigned', label: 'Assigned', count: cases?.filter(c => c.status === 'assigned').length || 0 },
+        { value: 'in_progress', label: 'In Progress', count: cases?.filter(c => c.status === 'in_progress').length || 0 },
+        { value: 'promise_to_pay', label: 'Promised to Pay', count: cases?.filter(c => c.status === 'promise_to_pay').length || 0 },
+        { value: 'refused', label: 'Refused', count: cases?.filter(c => c.status === 'refused').length || 0 },
+        { value: 'resolved', label: 'Resolved', count: cases?.filter(c => c.status === 'resolved' || c.status === 'closed').length || 0 },
+    ];
+
+
     return (
         <div className="page-container">
             <PageHeader
@@ -217,8 +371,64 @@ export default function DashboardPage() {
 
             {/* Recent Cases */}
             <div className="card">
-                <div className="card-header">
-                    Recent Cases
+                <div className="card-header" style={{
+                    borderBottom: '1px solid var(--border-subtle)',
+                    paddingBottom: '1rem',
+                    marginBottom: '1rem'
+                }}>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                        <div>
+                            <h3 className="font-bold text-lg flex items-center gap-2">
+                                <LayoutDashboard size={20} className="text-primary" />
+                                Case Management
+                            </h3>
+                            <p className="text-sm text-gray-500 font-medium mt-1">
+                                {filteredCases.length} active cases found
+                            </p>
+                        </div>
+
+                        <div className="relative w-full md:w-80">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search size={20} className="text-gray-500" strokeWidth={2} />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search cases..."
+                                className="form-input pl-10 pr-4 py-2 w-full text-sm transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    backgroundColor: 'var(--bg-primary)',
+                                    border: '1px solid var(--border-default)',
+                                    borderRadius: '6px',
+                                    color: 'var(--text-primary)',
+                                    paddingLeft: '2.5rem' // Ensure text doesn't overlap larger icon
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Status Filter Tabs */}
+                    <div className="flex flex-wrap gap-2 overflow-x-auto pb-2 -mx-2 px-2 md:mx-0 md:px-0 md:overflow-visible">
+                        {statusFilters.map((filter) => (
+                            <button
+                                key={filter.value}
+                                onClick={() => setStatusFilter(filter.value)}
+                                className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 border ${statusFilter === filter.value
+                                    ? 'bg-primary text-white border-primary shadow-sm'
+                                    : 'bg-transparent text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                    }`}
+                            >
+                                {filter.label}
+                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${statusFilter === filter.value
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-gray-200 text-gray-600'
+                                    }`}>
+                                    {filter.count}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
                 <div className="table-container">
                     <table className="table">
@@ -226,16 +436,68 @@ export default function DashboardPage() {
                             <tr>
                                 <th>Case #</th>
                                 <th>Customer</th>
-                                <th>Amount</th>
-                                <th>Overdue</th>
-                                <th>Priority</th>
-                                <th>Status</th>
+                                <th
+                                    onClick={() => handleSort('amount')}
+                                    style={{ cursor: 'pointer', userSelect: 'none' }}
+                                    className="hover-highlight"
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                                        Amount
+                                        {sortColumn === 'amount' ? (
+                                            sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                                        ) : (
+                                            <ArrowUpDown size={14} style={{ opacity: 0.3 }} />
+                                        )}
+                                    </div>
+                                </th>
+                                <th
+                                    onClick={() => handleSort('overdueDays')}
+                                    style={{ cursor: 'pointer', userSelect: 'none' }}
+                                    className="hover-highlight"
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                                        Overdue
+                                        {sortColumn === 'overdueDays' ? (
+                                            sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                                        ) : (
+                                            <ArrowUpDown size={14} style={{ opacity: 0.3 }} />
+                                        )}
+                                    </div>
+                                </th>
+                                <th
+                                    onClick={() => handleSort('priority')}
+                                    style={{ cursor: 'pointer', userSelect: 'none' }}
+                                    className="hover-highlight"
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                                        Priority
+                                        {sortColumn === 'priority' ? (
+                                            sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                                        ) : (
+                                            <ArrowUpDown size={14} style={{ opacity: 0.3 }} />
+                                        )}
+                                    </div>
+                                </th>
+                                <th
+                                    onClick={() => handleSort('status')}
+                                    style={{ cursor: 'pointer', userSelect: 'none' }}
+                                    className="hover-highlight"
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                                        Status
+                                        {sortColumn === 'status' ? (
+                                            sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                                        ) : (
+                                            <ArrowUpDown size={14} style={{ opacity: 0.3 }} />
+                                        )}
+                                    </div>
+                                </th>
                                 <th>Assigned DCA</th>
                                 <th className="text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {cases?.slice(0, 10).map((caseItem: any) => (
+                            {filteredCases.map((caseItem: any) => (
                                 <tr key={caseItem.id}>
                                     <td>
                                         <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>
@@ -246,8 +508,8 @@ export default function DashboardPage() {
                                     <td>${caseItem.amount.toLocaleString()}</td>
                                     <td>{caseItem.overdueDays} days</td>
                                     <td>
-                                        <span className={`badge badge-${caseItem.priority}`}>
-                                            {caseItem.priority}
+                                        <span className={`badge badge-${calculatePriority(caseItem)}`}>
+                                            {calculatePriority(caseItem)}
                                         </span>
                                     </td>
                                     <td>

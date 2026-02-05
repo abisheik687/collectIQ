@@ -1,9 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, TrendingUp, PieChart, BarChart3 } from 'lucide-react';
 import { useState } from 'react';
 import api from '../services/api';
+import PageHeader from '../components/PageHeader';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
 
@@ -93,9 +94,14 @@ export default function AnalyticsPage() {
     };
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ margin: 0 }}>Analytics Dashboard</h1>
+        <div className="page-container">
+            <PageHeader
+                title="Analytics & Insights"
+                subtitle="Real-time case metrics, trends, and performance analytics with auto-refresh"
+            />
+
+            {/* Refresh Button */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 'var(--space-6)' }}>
                 <button
                     onClick={handleRefresh}
                     disabled={isRefreshing}
@@ -103,28 +109,7 @@ export default function AnalyticsPage() {
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.75rem 1.5rem',
-                        backgroundColor: isRefreshing ? '#6B7280' : '#7C3AED',
-                        border: 'none',
-                        borderRadius: '0.5rem',
-                        color: 'white',
-                        fontSize: '0.875rem',
-                        fontWeight: '600',
-                        cursor: isRefreshing ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                        if (!isRefreshing) {
-                            e.currentTarget.style.backgroundColor = '#6D28D9';
-                            e.currentTarget.style.transform = 'translateY(-1px)';
-                        }
-                    }}
-                    onMouseLeave={(e) => {
-                        if (!isRefreshing) {
-                            e.currentTarget.style.backgroundColor = '#7C3AED';
-                            e.currentTarget.style.transform = 'translateY(0)';
-                        }
+                        gap: '0.5rem'
                     }}
                 >
                     <RefreshCw
@@ -144,26 +129,45 @@ export default function AnalyticsPage() {
                 }
             `}</style>
 
-            <div className="grid grid-cols-2" style={{ marginBottom: '2rem' }}>
+            {/* Charts Grid */}
+            <div className="grid grid-cols-2 gap-6 mb-6">
+                {/* Status Distribution */}
                 <div className="card">
-                    <h3 style={{ marginBottom: '1rem' }}>Status Distribution</h3>
-                    <div style={{ height: '300px' }}>
-                        <Pie data={statusChartData} options={{ maintainAspectRatio: false }} />
+                    <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <PieChart size={18} />
+                        Status Distribution
+                    </div>
+                    <div className="card-padding">
+                        <div style={{ height: '300px' }}>
+                            <Pie data={statusChartData} options={{ maintainAspectRatio: false }} />
+                        </div>
                     </div>
                 </div>
 
+                {/* Aging Buckets */}
                 <div className="card">
-                    <h3 style={{ marginBottom: '1rem' }}>Aging Buckets</h3>
-                    <div style={{ height: '300px' }}>
-                        <Bar data={agingChartData} options={{ maintainAspectRatio: false, responsive: true }} />
+                    <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <BarChart3 size={18} />
+                        Aging Buckets
+                    </div>
+                    <div className="card-padding">
+                        <div style={{ height: '300px' }}>
+                            <Bar data={agingChartData} options={{ maintainAspectRatio: false, responsive: true }} />
+                        </div>
                     </div>
                 </div>
             </div>
 
+            {/* DCA Performance */}
             <div className="card">
-                <h3 style={{ marginBottom: '1rem' }}>DCA Performance</h3>
-                <div style={{ height: '300px' }}>
-                    <Bar data={dcaChartData} options={{ maintainAspectRatio: false, responsive: true }} />
+                <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <TrendingUp size={18} />
+                    DCA Performance Comparison
+                </div>
+                <div className="card-padding">
+                    <div style={{ height: '350px' }}>
+                        <Bar data={dcaChartData} options={{ maintainAspectRatio: false, responsive: true }} />
+                    </div>
                 </div>
             </div>
         </div>
