@@ -24,7 +24,7 @@ services:
     runtime: python
     region: oregon
     plan: free
-    branch: main
+    branch: master
     rootDir: ml-models
     buildCommand: pip install -r requirements.txt && python training/train_model.py || true
     startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120 api:app
@@ -45,7 +45,7 @@ services:
     runtime: node
     region: oregon
     plan: free
-    branch: main
+    branch: master
     rootDir: backend
     buildCommand: npm ci && npm run build
     startCommand: node dist/server.js
@@ -73,7 +73,6 @@ services:
           type: web
           name: collectiq-ml-api
           property: host
-          envVarKey: ML_API_URL
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
@@ -83,7 +82,6 @@ services:
           type: web
           name: collectiq-frontend
           property: host
-          envVarKey: CORS_ORIGIN
       - key: MAX_FILE_SIZE
         value: 10485760
       - key: DEFAULT_SLA_HOURS
@@ -108,9 +106,8 @@ services:
   - type: web
     name: collectiq-frontend
     runtime: static
-    region: oregon
     plan: free
-    branch: main
+    branch: master
     rootDir: frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
@@ -139,7 +136,6 @@ services:
           type: web
           name: collectiq-backend
           property: host
-          envVarKey: VITE_API_URL
       - key: VITE_APP_NAME
         value: CollectIQ
       - key: VITE_APP_VERSION
