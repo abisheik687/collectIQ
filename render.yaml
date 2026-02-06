@@ -106,7 +106,6 @@ services:
   - type: web
     name: collectiq-frontend
     runtime: static
-    plan: free
     branch: master
     rootDir: frontend
     buildCommand: npm ci && npm run build
